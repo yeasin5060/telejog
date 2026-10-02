@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -7,11 +7,14 @@ import { styles } from '@/assets/styles/AuthScreen.styles';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 
+import {SvgXml} from 'react-native-svg'
+import { TextInput } from 'react-native-gesture-handler';
+
 type Mode = 'login' | 'register';
 
 export default function AuthScreen() {
 
-  const [mode, setMode] = useState<Mode>("login");
+  const [mode, setMode] = useState<Mode>("register");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,8 +39,42 @@ export default function AuthScreen() {
           <View style={styles.logoRow}>
             <LinearGradient
               colors={[Colors.primary, Colors.primaryContainer]}
-              style={styles.logoBox}
-            />
+              style={styles.logoBox}>
+                <SvgXml xml={svgMarkup} width="50%" height="50%" />
+              </LinearGradient>
+              <Text style={styles.appName}>teleJog</Text>
+          </View>
+          {/* Hero text*/}
+          <Text style={styles.heading}>
+            {mode === 'login' ? 'Welcome back!' : 'Create your account'}
+          </Text>
+          <Text style={styles.subheading}>
+            {mode === 'login' ? 'sign in to continue chatting' : 'Fill in your details to get started'}
+          </Text>
+          <View style={styles.form}>
+            {mode === 'register' && (
+              <>
+                <View style={styles.field}>
+                  <Text style={styles.fieldLabel}>Full Name</Text>
+                  <TextInput style = {styles.input} value={name} onChangeText={setName} placeholder="Enter your full name" placeholderTextColor={Colors.outlineVariant} autoCapitalize='words' />
+                </View>
+                <View style={styles.field}>
+                  <Text style={styles.fieldLabel}>Username Handle</Text>
+                  <View style = {styles.handleRow}>
+                    <Text style = {styles.atSign}>@</Text>
+                    <TextInput style = {[styles.input, styles.handleInput]} value={handle} onChangeText={(v) => setHandle(v.toLowerCase().replace(/\s/g, ''))} placeholder="Enter your username" placeholderTextColor={Colors.outlineVariant} autoCapitalize='none' />
+                  </View>
+                </View>
+              </>
+            )}
+             <View style={styles.field}>
+                <Text style={styles.fieldLabel}>Email</Text>
+                <TextInput style = {styles.input} value={email} onChangeText={setEmail} placeholder="Enter your email" placeholderTextColor={Colors.outlineVariant} autoCapitalize='none' keyboardType='email-address' />
+              </View>
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Password</Text>
+              <TextInput style = {styles.input} value={password} onChangeText={setPassword} placeholder="Enter your password" placeholderTextColor={Colors.outlineVariant} secureTextEntry />
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
