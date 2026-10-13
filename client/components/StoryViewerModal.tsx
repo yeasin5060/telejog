@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Modal, Image, TouchableOpacity, Dimensions, SafeAreaView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  SafeAreaView,
+  TextInput,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { UserStory } from '@/types';
 import { Colors } from '@/constants/Colors';
@@ -14,10 +24,12 @@ interface Props {
 
 export default function StoryViewerModal({ visible, userStory, onClose }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [replyText, setReplyText] = useState('');
 
   useEffect(() => {
     if (visible) {
       setCurrentIndex(0);
+      setReplyText('');
     }
   }, [visible]);
 
@@ -49,7 +61,7 @@ export default function StoryViewerModal({ visible, userStory, onClose }: Props)
               <View
                 style={[
                   styles.progressBar,
-                  { width: idx <= currentIndex ? '100%' : '0%' }
+                  { width: idx <= currentIndex ? '100%' : '0%' },
                 ]}
               />
             </View>
@@ -71,17 +83,35 @@ export default function StoryViewerModal({ visible, userStory, onClose }: Props)
         {/* Main Image */}
         <Image source={{ uri: currentStory.mediaUrl }} style={styles.media} resizeMode="cover" />
 
-        {/* Story Caption */}
-        {currentStory.caption && (
-          <View style={styles.captionBox}>
-            <Text style={styles.captionText}>{currentStory.caption}</Text>
-          </View>
-        )}
-
         {/* Touch Navigation Overlay */}
         <View style={styles.touchArea}>
           <TouchableOpacity style={styles.touchLeft} onPress={handlePrev} />
           <TouchableOpacity style={styles.touchRight} onPress={handleNext} />
+        </View>
+
+        {/* Story Caption & Quick Reply Input */}
+        <View style={styles.bottomOverlay}>
+          {currentStory.caption && (
+            <View style={styles.captionBox}>
+              <Text style={styles.captionText}>{currentStory.caption}</Text>
+            </View>
+          )}
+
+          <View style={styles.replyBar}>
+            <TextInput
+              placeholder="Send a reply..."
+              placeholderTextColor="rgba(255,255,255,0.6)"
+              style={styles.replyInput}
+              value={replyText}
+              onChangeText={setReplyText}
+            />
+            <TouchableOpacity style={styles.likeBtn}>
+              <Ionicons name="heart" size={24} color="#FF4757" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.sendStoryBtn} onPress={onClose}>
+              <Ionicons name="send" size={18} color="#FFF" />
+            </TouchableOpacity>
+          </View>
         </View>
       </SafeAreaView>
     </Modal>
@@ -95,35 +125,35 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 10,
-    paddingTop: 15,
+    paddingHorizontal: 12,
+    paddingTop: 16,
     zIndex: 10,
   },
   progressTrack: {
     flex: 1,
     height: 3,
     backgroundColor: 'rgba(255,255,255,0.3)',
-    marginHorizontal: 2,
+    marginHorizontal: 2.5,
     borderRadius: 2,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#FFF',
+    backgroundColor: '#00A8FF',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 16,
     paddingVertical: 12,
     zIndex: 10,
   },
   avatar: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#00A8FF',
   },
   userInfo: {
     flex: 1,
@@ -139,28 +169,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   closeBtn: {
-    padding: 5,
+    padding: 6,
   },
   media: {
     width: width,
-    height: height * 0.75,
+    height: height * 0.72,
     alignSelf: 'center',
     marginVertical: 'auto',
-  },
-  captionBox: {
-    position: 'absolute',
-    bottom: 50,
-    left: 20,
-    right: 20,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    padding: 12,
-    borderRadius: 10,
-    zIndex: 10,
-  },
-  captionText: {
-    color: '#FFF',
-    fontSize: 14,
-    textAlign: 'center',
   },
   touchArea: {
     ...StyleSheet.absoluteFill,
@@ -172,5 +187,54 @@ const styles = StyleSheet.create({
   },
   touchRight: {
     flex: 1,
+  },
+  bottomOverlay: {
+    position: 'absolute',
+    bottom: 20,
+    left: 14,
+    right: 14,
+    zIndex: 10,
+  },
+  captionBox: {
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  captionText: {
+    color: '#FFF',
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  replyBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(20, 28, 43, 0.9)',
+    borderRadius: 24,
+    paddingHorizontal: 14,
+    height: 48,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  replyInput: {
+    flex: 1,
+    color: '#FFF',
+    fontSize: 14,
+  },
+  likeBtn: {
+    padding: 6,
+    marginRight: 4,
+  },
+  sendStoryBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#00A8FF',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

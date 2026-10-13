@@ -7,8 +7,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Modal,
-  Alert,
-  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -33,21 +31,18 @@ export default function DevicesScreen() {
   const currentDevice = sessions.find((s) => s.isCurrent) || sessions[0];
   const otherSessions = sessions.filter((s) => !s.isCurrent);
 
-  // Terminate a single session
   const handleTerminateSession = (sessionId: string) => {
     setSessions((prev) => prev.filter((s) => s.id !== sessionId));
     setSelectedSession(null);
     showToast('Session terminated successfully');
   };
 
-  // Terminate all other sessions
   const handleTerminateAllOtherSessions = () => {
     setSessions((prev) => prev.filter((s) => s.isCurrent));
     setShowTerminateAllModal(false);
     showToast('All other sessions terminated');
   };
 
-  // Simulate scanning QR and adding desktop session
   const handleLinkNewDesktop = () => {
     const newDesktopSession: DeviceSession = {
       id: `dev_desktop_${Date.now()}`,
@@ -62,7 +57,7 @@ export default function DevicesScreen() {
     };
     setSessions((prev) => [currentDevice, newDesktopSession, ...otherSessions]);
     setShowQRModal(false);
-    showToast('New desktop device linked successfully! 💻');
+    showToast('New desktop device linked! 💻');
   };
 
   const getDeviceIcon = (type: DeviceSession['deviceType']) => {
@@ -91,7 +86,7 @@ export default function DevicesScreen() {
           style={styles.qrScanBtn}
           onPress={() => setShowQRModal(true)}
         >
-          <Ionicons name="qr-code-outline" size={22} color="#2AABEE" />
+          <Ionicons name="qr-code-outline" size={22} color="#00A8FF" />
         </TouchableOpacity>
       </View>
 
@@ -99,11 +94,11 @@ export default function DevicesScreen() {
         {/* Link Desktop Device Hero Card */}
         <View style={styles.heroCard}>
           <View style={styles.heroIconBox}>
-            <MaterialCommunityIcons name="laptop-account" size={48} color="#2AABEE" />
+            <MaterialCommunityIcons name="laptop-account" size={44} color="#00A8FF" />
           </View>
           <Text style={styles.heroTitle}>Link Telejog Desktop</Text>
           <Text style={styles.heroSub}>
-            Scan the QR code displayed on Telejog Web or Desktop to sync messages seamlessly across all screens.
+            Scan the QR code displayed on Telejog Web or Desktop to sync messages seamlessly.
           </Text>
 
           <TouchableOpacity
@@ -116,16 +111,16 @@ export default function DevicesScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* SECTION 1: THIS DEVICE (CURRENT SESSION) */}
+        {/* THIS DEVICE (CURRENT SESSION) */}
         <View style={styles.section}>
           <Text style={styles.sectionHeader}>THIS DEVICE</Text>
-          <View style={styles.card}>
+          <View style={styles.cardContainer}>
             <View style={styles.deviceRow}>
               <View style={styles.deviceIconWrapperCurrent}>
                 <Ionicons
                   name={getDeviceIcon(currentDevice.deviceType) as any}
                   size={24}
-                  color="#2AABEE"
+                  color="#00A8FF"
                 />
               </View>
 
@@ -146,7 +141,7 @@ export default function DevicesScreen() {
           </View>
         </View>
 
-        {/* TERMINATE ALL OTHER SESSIONS BUTTON */}
+        {/* TERMINATE ALL OTHER SESSIONS */}
         {otherSessions.length > 0 && (
           <View style={{ paddingHorizontal: 16, marginTop: 14 }}>
             <TouchableOpacity
@@ -154,32 +149,34 @@ export default function DevicesScreen() {
               activeOpacity={0.8}
               onPress={() => setShowTerminateAllModal(true)}
             >
-              <Ionicons name="power-outline" size={18} color="#E53935" style={{ marginRight: 8 }} />
+              <Ionicons name="power-outline" size={18} color="#FF4757" style={{ marginRight: 8 }} />
               <Text style={styles.terminateAllText}>Terminate All Other Sessions</Text>
             </TouchableOpacity>
             <Text style={styles.terminateAllHelp}>
-              Logs out all other devices except this current phone.
+              Logs out all other active sessions except this phone.
             </Text>
           </View>
         )}
 
-        {/* SECTION 2: ACTIVE SESSIONS */}
+        {/* ACTIVE SESSIONS */}
         <View style={styles.section}>
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionHeader}>ACTIVE SESSIONS</Text>
-            <Text style={styles.sessionCountBadge}>{otherSessions.length}</Text>
+            <View style={styles.sessionCountBadge}>
+              <Text style={styles.sessionCountText}>{otherSessions.length}</Text>
+            </View>
           </View>
 
           {otherSessions.length === 0 ? (
             <View style={styles.cardEmpty}>
-              <Ionicons name="checkmark-circle-outline" size={32} color="#2AABEE" />
+              <Ionicons name="checkmark-circle-outline" size={32} color="#00A8FF" />
               <Text style={styles.emptyTitle}>No other active sessions</Text>
               <Text style={styles.emptySub}>
                 You are only logged in on this mobile device.
               </Text>
             </View>
           ) : (
-            <View style={styles.card}>
+            <View style={styles.cardContainer}>
               {otherSessions.map((session, index) => (
                 <React.Fragment key={session.id}>
                   <TouchableOpacity
@@ -191,7 +188,7 @@ export default function DevicesScreen() {
                       <Ionicons
                         name={getDeviceIcon(session.deviceType) as any}
                         size={22}
-                        color="#7F91A4"
+                        color="#8B9BB0"
                       />
                     </View>
 
@@ -209,7 +206,7 @@ export default function DevicesScreen() {
                       style={styles.disconnectItemBtn}
                       onPress={() => handleTerminateSession(session.id)}
                     >
-                      <Ionicons name="close-circle-outline" size={20} color="#E53935" />
+                      <Ionicons name="close-circle-outline" size={20} color="#FF4757" />
                     </TouchableOpacity>
                   </TouchableOpacity>
 
@@ -220,11 +217,11 @@ export default function DevicesScreen() {
           )}
         </View>
 
-        {/* SECTION 3: AUTOMATICALLY TERMINATE OLD SESSIONS */}
+        {/* AUTOMATIC TERMINATION */}
         <View style={styles.section}>
           <Text style={styles.sectionHeader}>AUTOMATIC TERMINATION</Text>
-          <View style={styles.card}>
-            <View style={{ padding: 14 }}>
+          <View style={styles.cardContainer}>
+            <View style={{ padding: 16 }}>
               <Text style={styles.autoTerminateTitle}>If inactive for</Text>
               <Text style={styles.autoTerminateSub}>
                 Sessions that remain inactive will be logged out automatically.
@@ -268,7 +265,7 @@ export default function DevicesScreen() {
         </View>
       )}
 
-      {/* MODAL 1: LINK DESKTOP QR CODE SIMULATION */}
+      {/* MODAL 1: LINK DESKTOP QR CODE */}
       {showQRModal && (
         <Modal visible transparent animationType="slide" onRequestClose={() => setShowQRModal(false)}>
           <View style={styles.modalOverlay}>
@@ -281,14 +278,13 @@ export default function DevicesScreen() {
               </View>
 
               <Text style={styles.qrInstructions}>
-                1. Open <Text style={{ color: '#2AABEE', fontWeight: 'bold' }}>web.telejog.org</Text> or Telejog Desktop app on your computer.
-                {'\n'}2. Point your camera at the QR code on the screen.
+                1. Open <Text style={{ color: '#00A8FF', fontWeight: 'bold' }}>web.telejog.org</Text> on your computer.
+                {'\n'}2. Point your camera at the screen to log in.
               </Text>
 
-              {/* QR Scanner Frame Simulation */}
               <View style={styles.qrFrameContainer}>
                 <View style={styles.qrFrameBox}>
-                  <Ionicons name="qr-code" size={170} color="#2AABEE" />
+                  <Ionicons name="qr-code" size={160} color="#00A8FF" />
                   <View style={styles.qrScannerBar} />
                 </View>
                 <Text style={styles.qrScanningText}>Camera active · Scanning...</Text>
@@ -307,7 +303,7 @@ export default function DevicesScreen() {
         </Modal>
       )}
 
-      {/* MODAL 2: SESSION DETAILS MODAL */}
+      {/* MODAL 2: SESSION DETAILS */}
       {selectedSession && (
         <Modal
           visible={!!selectedSession}
@@ -328,8 +324,8 @@ export default function DevicesScreen() {
                 <View style={styles.detailIconWrapper}>
                   <Ionicons
                     name={getDeviceIcon(selectedSession.deviceType) as any}
-                    size={32}
-                    color="#2AABEE"
+                    size={30}
+                    color="#00A8FF"
                   />
                 </View>
                 <View style={{ marginLeft: 14 }}>
@@ -361,7 +357,7 @@ export default function DevicesScreen() {
                 style={styles.terminateSingleBtn}
                 onPress={() => handleTerminateSession(selectedSession.id)}
               >
-                <Ionicons name="trash-outline" size={18} color="#E53935" style={{ marginRight: 6 }} />
+                <Ionicons name="trash-outline" size={18} color="#FF4757" style={{ marginRight: 6 }} />
                 <Text style={styles.terminateSingleText}>Terminate Session</Text>
               </TouchableOpacity>
             </View>
@@ -369,7 +365,7 @@ export default function DevicesScreen() {
         </Modal>
       )}
 
-      {/* MODAL 3: CONFIRM TERMINATE ALL OTHER SESSIONS */}
+      {/* MODAL 3: CONFIRM TERMINATE ALL */}
       {showTerminateAllModal && (
         <Modal
           visible={showTerminateAllModal}
@@ -380,11 +376,11 @@ export default function DevicesScreen() {
           <View style={styles.modalOverlay}>
             <View style={styles.alertCard}>
               <View style={styles.alertIconBox}>
-                <Ionicons name="warning-outline" size={36} color="#E53935" />
+                <Ionicons name="warning-outline" size={36} color="#FF4757" />
               </View>
               <Text style={styles.alertTitle}>Terminate all other sessions?</Text>
               <Text style={styles.alertSub}>
-                Are you sure you want to log out from {otherSessions.length} active sessions? You will need to log in again on those devices.
+                Are you sure you want to log out from {otherSessions.length} active sessions?
               </Text>
 
               <View style={styles.alertButtonsRow}>
@@ -413,16 +409,16 @@ export default function DevicesScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0E1621',
+    backgroundColor: '#0B0F17',
   },
   header: {
     height: 56,
-    backgroundColor: '#17212B',
+    backgroundColor: '#0E1420',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#101721',
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
   },
   backBtn: {
     padding: 6,
@@ -431,8 +427,8 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#FFF',
     fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 16,
+    fontWeight: '800',
+    marginLeft: 14,
   },
   qrScanBtn: {
     padding: 6,
@@ -441,95 +437,104 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   heroCard: {
-    backgroundColor: '#17212B',
+    backgroundColor: '#141C2B',
     margin: 16,
-    padding: 20,
-    borderRadius: 16,
+    padding: 22,
+    borderRadius: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#22303E',
+    borderColor: 'rgba(0, 168, 255, 0.2)',
+    shadowColor: '#00A8FF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
   heroIconBox: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(42, 171, 238, 0.15)',
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    backgroundColor: 'rgba(0, 168, 255, 0.12)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: 12,
   },
   heroTitle: {
     color: '#FFF',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '800',
     marginBottom: 6,
   },
   heroSub: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 13,
     textAlign: 'center',
     lineHeight: 18,
-    marginBottom: 16,
-    paddingHorizontal: 10,
+    marginBottom: 18,
+    paddingHorizontal: 8,
   },
   linkDesktopBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2AABEE',
+    backgroundColor: '#00A8FF',
     paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingHorizontal: 26,
     borderRadius: 24,
-    shadowColor: '#2AABEE',
+    shadowColor: '#00A8FF',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.35,
     shadowRadius: 6,
     elevation: 4,
   },
   linkDesktopBtnText: {
     color: '#FFF',
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontSize: 14.5,
+    fontWeight: '700',
   },
   section: {
-    marginTop: 18,
+    marginTop: 20,
+    paddingHorizontal: 16,
   },
   sectionHeader: {
-    color: '#2AABEE',
-    fontSize: 13,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-    marginHorizontal: 16,
+    color: '#00A8FF',
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.8,
     marginBottom: 8,
+    marginLeft: 4,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 16,
     marginBottom: 8,
+    marginLeft: 4,
   },
   sessionCountBadge: {
-    backgroundColor: '#242F3D',
-    color: '#2AABEE',
-    fontSize: 12,
-    fontWeight: 'bold',
-    paddingHorizontal: 7,
-    paddingVertical: 1,
+    backgroundColor: 'rgba(0, 168, 255, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: 10,
-    marginLeft: 6,
+    marginLeft: 8,
   },
-  card: {
-    backgroundColor: '#17212B',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#101721',
+  sessionCountText: {
+    color: '#00A8FF',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  cardContainer: {
+    backgroundColor: '#141C2B',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    overflow: 'hidden',
   },
   cardEmpty: {
-    backgroundColor: '#17212B',
+    backgroundColor: '#141C2B',
+    borderRadius: 16,
     padding: 24,
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#101721',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   emptyTitle: {
     color: '#FFF',
@@ -538,7 +543,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   emptySub: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 12,
     marginTop: 2,
   },
@@ -552,7 +557,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(42, 171, 238, 0.15)',
+    backgroundColor: 'rgba(0, 168, 255, 0.12)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -560,7 +565,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#242F3D',
+    backgroundColor: '#1D283E',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -580,7 +585,7 @@ const styles = StyleSheet.create({
   onlineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+    backgroundColor: 'rgba(0, 230, 118, 0.12)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
@@ -590,13 +595,13 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00E676',
     marginRight: 4,
   },
   onlineText: {
-    color: '#4CAF50',
+    color: '#00E676',
     fontSize: 11,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   deviceSub: {
     color: '#A2B0BF',
@@ -604,7 +609,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   deviceMeta: {
-    color: '#657786',
+    color: '#5E6F85',
     fontSize: 12,
     marginTop: 2,
   },
@@ -613,26 +618,26 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 0.6,
-    backgroundColor: '#22303E',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     marginLeft: 74,
   },
   terminateAllBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(229, 57, 53, 0.12)',
-    paddingVertical: 12,
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 71, 87, 0.12)',
+    paddingVertical: 13,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(229, 57, 53, 0.25)',
+    borderColor: 'rgba(255, 71, 87, 0.25)',
   },
   terminateAllText: {
-    color: '#E53935',
+    color: '#FF4757',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   terminateAllHelp: {
-    color: '#657786',
+    color: '#5E6F85',
     fontSize: 12,
     textAlign: 'center',
     marginTop: 6,
@@ -643,10 +648,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   autoTerminateSub: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 12,
     marginTop: 2,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   periodPillRow: {
     flexDirection: 'row',
@@ -654,7 +659,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   periodPill: {
-    backgroundColor: '#242F3D',
+    backgroundColor: '#1D283E',
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 16,
@@ -662,28 +667,28 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   periodPillActive: {
-    backgroundColor: 'rgba(42, 171, 238, 0.2)',
-    borderColor: '#2AABEE',
+    backgroundColor: 'rgba(0, 168, 255, 0.18)',
+    borderColor: '#00A8FF',
   },
   periodPillText: {
-    color: '#7F91A4',
-    fontSize: 13,
+    color: '#8B9BB0',
+    fontSize: 12.5,
     fontWeight: '500',
   },
   periodPillTextActive: {
-    color: '#2AABEE',
-    fontWeight: 'bold',
+    color: '#00A8FF',
+    fontWeight: '700',
   },
   toastContainer: {
     position: 'absolute',
     top: 70,
     alignSelf: 'center',
-    backgroundColor: 'rgba(23, 33, 43, 0.95)',
+    backgroundColor: 'rgba(20, 28, 43, 0.95)',
     paddingHorizontal: 16,
     paddingVertical: 9,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#2AABEE',
+    borderColor: '#00A8FF',
     zIndex: 999,
   },
   toastText: {
@@ -701,12 +706,12 @@ const styles = StyleSheet.create({
   qrModalSheet: {
     width: '94%',
     maxWidth: 360,
-    backgroundColor: '#17212B',
-    borderRadius: 20,
+    backgroundColor: '#141C2B',
+    borderRadius: 22,
     padding: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#243242',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   modalHeader: {
     width: '100%',
@@ -737,35 +742,35 @@ const styles = StyleSheet.create({
   qrFrameBox: {
     width: 200,
     height: 200,
-    borderRadius: 16,
-    backgroundColor: '#0E1621',
+    borderRadius: 18,
+    backgroundColor: '#0B0F17',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#2AABEE',
+    borderColor: '#00A8FF',
     position: 'relative',
     overflow: 'hidden',
   },
   qrScannerBar: {
     position: 'absolute',
     width: '100%',
-    height: 2,
-    backgroundColor: '#2AABEE',
+    height: 2.5,
+    backgroundColor: '#00A8FF',
     top: '50%',
-    shadowColor: '#2AABEE',
+    shadowColor: '#00A8FF',
     shadowOpacity: 0.8,
     shadowRadius: 6,
     elevation: 4,
   },
   qrScanningText: {
-    color: '#40A7E3',
+    color: '#00A8FF',
     fontSize: 12,
     marginTop: 8,
   },
   confirmScanBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2AABEE',
+    backgroundColor: '#00A8FF',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 22,
@@ -773,17 +778,17 @@ const styles = StyleSheet.create({
   },
   confirmScanText: {
     color: '#FFF',
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontSize: 14.5,
+    fontWeight: '700',
   },
   sessionDetailCard: {
     width: '90%',
     maxWidth: 340,
-    backgroundColor: '#17212B',
-    borderRadius: 18,
+    backgroundColor: '#141C2B',
+    borderRadius: 20,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#243242',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   detailIconRow: {
     flexDirection: 'row',
@@ -791,10 +796,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   detailIconWrapper: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: 'rgba(42, 171, 238, 0.15)',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(0, 168, 255, 0.12)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -804,12 +809,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   detailPlatform: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 13,
   },
   detailFieldsBox: {
-    backgroundColor: '#0E1621',
-    borderRadius: 12,
+    backgroundColor: '#0B0F17',
+    borderRadius: 14,
     padding: 12,
     marginBottom: 16,
   },
@@ -817,10 +822,10 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   detailFieldLabel: {
-    color: '#657786',
+    color: '#5E6F85',
     fontSize: 11,
     textTransform: 'uppercase',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   detailFieldValue: {
     color: '#FFF',
@@ -831,32 +836,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(229, 57, 53, 0.12)',
+    backgroundColor: 'rgba(255, 71, 87, 0.12)',
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(229, 57, 53, 0.3)',
+    borderColor: 'rgba(255, 71, 87, 0.3)',
   },
   terminateSingleText: {
-    color: '#E53935',
+    color: '#FF4757',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   alertCard: {
     width: '88%',
     maxWidth: 320,
-    backgroundColor: '#17212B',
-    borderRadius: 18,
+    backgroundColor: '#141C2B',
+    borderRadius: 20,
     padding: 22,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#243242',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   alertIconBox: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: 'rgba(229, 57, 53, 0.15)',
+    backgroundColor: 'rgba(255, 71, 87, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -882,9 +887,9 @@ const styles = StyleSheet.create({
   },
   alertCancelBtn: {
     flex: 1,
-    backgroundColor: '#242F3D',
+    backgroundColor: '#1E283E',
     paddingVertical: 11,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
   },
   alertCancelText: {
@@ -894,9 +899,9 @@ const styles = StyleSheet.create({
   },
   alertConfirmBtn: {
     flex: 1,
-    backgroundColor: '#E53935',
+    backgroundColor: '#FF4757',
     paddingVertical: 11,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
   },
   alertConfirmText: {

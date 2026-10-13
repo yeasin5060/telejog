@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
+import { useAppDispatch } from '@/store/hooks';
+import { login } from '@/store/slices/authSlice';
 
 export default function AuthScreen() {
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const handleNext = () => {
     if (step === 'phone') {
@@ -16,81 +28,108 @@ export default function AuthScreen() {
         setStep('otp');
       }
     } else {
-      // Complete Auth
-      router.replace('/(tabs)');
+      // Complete Auth via Redux Toolkit
+      dispatch(
+        login({
+          token: `telejog_token_${Date.now()}`,
+        })
+      );
     }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        {/* Telejog Logo & Header */}
-        <View style={styles.logoContainer}>
-          <View style={styles.iconCircle}>
-            <Ionicons name="paper-plane" size={44} color="#FFF" style={{ marginLeft: -3, marginTop: 2 }} />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <View style={styles.container}>
+          {/* Telejog Glowing Logo & Header */}
+          <View style={styles.logoContainer}>
+            <View style={styles.iconCircleGlow}>
+              <View style={styles.iconCircle}>
+                <Ionicons
+                  name="paper-plane"
+                  size={46}
+                  color="#FFF"
+                  style={{ marginLeft: -3, marginTop: 2 }}
+                />
+              </View>
+            </View>
+            <Text style={styles.appName}>Telejog</Text>
+            <Text style={styles.subTitle}>
+              {step === 'phone'
+                ? 'The world’s fastest messaging app. It is free and secure.'
+                : `We've sent an SMS with an activation code to +880 ${phoneNumber}`}
+            </Text>
           </View>
-          <Text style={styles.appName}>Telejog</Text>
-          <Text style={styles.subTitle}>
-            {step === 'phone'
-              ? 'Please confirm your country code and enter your phone number.'
-              : `We've sent an SMS with an activation code to +880 ${phoneNumber}`}
+
+          {/* Input Form */}
+          {step === 'phone' ? (
+            <View style={styles.form}>
+              <TouchableOpacity style={styles.countryPicker} activeOpacity={0.8}>
+                <Text style={styles.countryText}>🇧🇩 Bangladesh (+880)</Text>
+                <Ionicons name="chevron-down" size={18} color="#8B9BB0" />
+              </TouchableOpacity>
+
+              <View style={styles.inputBox}>
+                <Text style={styles.prefix}>+880</Text>
+                <TextInput
+                  placeholder="Phone number"
+                  placeholderTextColor="#5E6F85"
+                  keyboardType="phone-pad"
+                  style={styles.input}
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
+                  autoFocus
+                />
+              </View>
+            </View>
+          ) : (
+            <View style={styles.form}>
+              <View style={styles.inputBox}>
+                <TextInput
+                  placeholder="00000"
+                  placeholderTextColor="#5E6F85"
+                  keyboardType="number-pad"
+                  style={[
+                    styles.input,
+                    { textAlign: 'center', letterSpacing: 10, fontSize: 26, fontWeight: 'bold' },
+                  ]}
+                  maxLength={5}
+                  value={otpCode}
+                  onChangeText={setOtpCode}
+                  autoFocus
+                />
+              </View>
+
+              <TouchableOpacity
+                onPress={() => setStep('phone')}
+                style={styles.changeNumBtn}
+              >
+                <Text style={styles.changeNumText}>Wrong number? Tap to change</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Glowing Continue Button */}
+          <TouchableOpacity
+            style={[
+              styles.continueBtn,
+              (step === 'phone' ? phoneNumber.length < 8 : otpCode.length < 3) &&
+                styles.continueBtnDisabled,
+            ]}
+            activeOpacity={0.85}
+            onPress={handleNext}
+          >
+            <Ionicons name="arrow-forward" size={24} color="#FFF" />
+          </TouchableOpacity>
+
+          <Text style={styles.footerNote}>
+            By continuing, you agree to Telejog's Privacy Policy & Terms of Service.
           </Text>
         </View>
-
-        {/* Input Form */}
-        {step === 'phone' ? (
-          <View style={styles.form}>
-            <TouchableOpacity style={styles.countryPicker}>
-              <Text style={styles.countryText}>🇧🇩 Bangladesh (+880)</Text>
-              <Ionicons name="chevron-down" size={18} color="#7F91A4" />
-            </TouchableOpacity>
-
-            <View style={styles.inputBox}>
-              <Text style={styles.prefix}>+880</Text>
-              <TextInput
-                placeholder="Phone number"
-                placeholderTextColor="#7F91A4"
-                keyboardType="phone-pad"
-                style={styles.input}
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-              />
-            </View>
-          </View>
-        ) : (
-          <View style={styles.form}>
-            <View style={styles.inputBox}>
-              <TextInput
-                placeholder="Code"
-                placeholderTextColor="#7F91A4"
-                keyboardType="number-pad"
-                style={[styles.input, { textAlign: 'center', letterSpacing: 8, fontSize: 24 }]}
-                maxLength={5}
-                value={otpCode}
-                onChangeText={setOtpCode}
-                autoFocus
-              />
-            </View>
-
-            <TouchableOpacity onPress={() => setStep('phone')} style={styles.changeNumBtn}>
-              <Text style={styles.changeNumText}>Wrong number?</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Continue Button */}
-        <TouchableOpacity
-          style={styles.continueBtn}
-          activeOpacity={0.85}
-          onPress={handleNext}
-        >
-          <Ionicons name="arrow-forward" size={24} color="#FFF" />
-        </TouchableOpacity>
-
-        <Text style={styles.footerNote}>
-          By continuing, you agree to Telejog's Privacy Policy & Terms of Service.
-        </Text>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -98,7 +137,7 @@ export default function AuthScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#17212B',
+    backgroundColor: '#0B0F17',
   },
   container: {
     flex: 1,
@@ -110,98 +149,121 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 36,
   },
+  iconCircleGlow: {
+    padding: 6,
+    borderRadius: 56,
+    backgroundColor: 'rgba(0, 168, 255, 0.1)',
+    marginBottom: 16,
+  },
   iconCircle: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#2AABEE',
+    width: 92,
+    height: 92,
+    borderRadius: 46,
+    backgroundColor: '#00A8FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#2AABEE',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
+    shadowColor: '#00A8FF',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 14,
     elevation: 8,
   },
   appName: {
     color: '#FFF',
-    fontSize: 28,
-    fontWeight: 'bold',
-    letterSpacing: 1,
+    fontSize: 32,
+    fontWeight: '800',
+    letterSpacing: 0.8,
   },
   subTitle: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 14,
     textAlign: 'center',
     marginTop: 10,
     lineHeight: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 16,
   },
   form: {
     width: '100%',
-    marginBottom: 40,
+    maxWidth: 340,
+    marginBottom: 32,
   },
   countryPicker: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#242F3D',
+    backgroundColor: '#141C2B',
     paddingHorizontal: 16,
     paddingVertical: 14,
-    borderRadius: 10,
+    borderRadius: 14,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   countryText: {
     color: '#FFF',
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   inputBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#242F3D',
+    backgroundColor: '#141C2B',
     paddingHorizontal: 16,
-    height: 52,
-    borderRadius: 10,
+    height: 54,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 168, 255, 0.25)',
   },
   prefix: {
-    color: '#2AABEE',
+    color: '#00A8FF',
     fontSize: 16,
     fontWeight: 'bold',
-    marginRight: 10,
+    marginRight: 12,
   },
   input: {
     flex: 1,
     color: '#FFF',
     fontSize: 16,
+    ...(Platform.OS === 'web'
+      ? ({
+          outlineStyle: 'none',
+          outlineWidth: 0,
+          outlineColor: 'transparent',
+          boxShadow: 'none',
+        } as any)
+      : {}),
   },
   changeNumBtn: {
-    marginTop: 12,
+    marginTop: 14,
     alignSelf: 'center',
   },
   changeNumText: {
-    color: '#2AABEE',
-    fontSize: 14,
+    color: '#00A8FF',
+    fontSize: 13.5,
     fontWeight: '600',
   },
   continueBtn: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#2AABEE',
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: '#00A8FF',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#2AABEE',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
+    shadowColor: '#00A8FF',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  continueBtnDisabled: {
+    opacity: 0.5,
   },
   footerNote: {
-    color: '#4E5D6E',
+    color: '#5E6F85',
     fontSize: 12,
     textAlign: 'center',
-    marginTop: 30,
+    marginTop: 36,
+    paddingHorizontal: 20,
+    lineHeight: 16,
   },
 });

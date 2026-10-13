@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { UserStory } from '@/types';
 import { Colors } from '@/constants/Colors';
 import StoryViewerModal from './StoryViewerModal';
+import { useAppSelector } from '@/store/hooks';
+import { dummyUserProfile } from '@/assets/assets';
 
 interface Props {
   stories: UserStory[];
@@ -11,40 +13,52 @@ interface Props {
 
 export default function StoriesBar({ stories }: Props) {
   const [selectedStory, setSelectedStory] = useState<UserStory | null>(null);
+  const currentUser = useAppSelector((state) => state.auth.user) || dummyUserProfile;
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Add My Story */}
-        <TouchableOpacity style={styles.storyItem}>
-          <View style={styles.myStoryContainer}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Add My Story Button */}
+        <TouchableOpacity style={styles.storyItem} activeOpacity={0.8}>
+          <View style={styles.myStoryWrapper}>
             <Image
-              source={{ uri: 'https://i.pravatar.cc/150?img=68' }}
+              source={{ uri: currentUser.avatar || 'https://i.pravatar.cc/150?img=68' }}
               style={styles.avatar}
             />
             <View style={styles.addBadge}>
-              <Ionicons name="add" size={14} color="#FFF" />
+              <Ionicons name="add" size={15} color="#FFF" />
             </View>
           </View>
-          <Text style={styles.nameText} numberOfLines={1}>My Story</Text>
+          <Text style={styles.myStoryText} numberOfLines={1}>Your story</Text>
         </TouchableOpacity>
 
-        {/* User Stories */}
+        {/* User Stories with Neon Gradient Rings */}
         {stories.map((item, idx) => (
           <TouchableOpacity
-            key={idx}
+            key={item.user._id || idx}
             style={styles.storyItem}
+            activeOpacity={0.8}
             onPress={() => setSelectedStory(item)}
           >
             <View
               style={[
-                styles.storyRing,
-                item.hasUnseen ? styles.unseenRing : styles.seenRing
+                styles.storyRingWrapper,
+                item.hasUnseen ? styles.unseenRing : styles.seenRing,
               ]}
             >
               <Image source={{ uri: item.user.avatar }} style={styles.avatar} />
             </View>
-            <Text style={styles.nameText} numberOfLines={1}>
+            <Text
+              style={[
+                styles.nameText,
+                item.hasUnseen && styles.unseenNameText,
+              ]}
+              numberOfLines={1}
+            >
               {item.user.name.split(' ')[0]}
             </Text>
           </TouchableOpacity>
@@ -63,58 +77,82 @@ export default function StoriesBar({ stories }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 10,
-    backgroundColor: 'transparent',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#242F3D',
+    paddingVertical: 12,
+    backgroundColor: '#0E1420',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
   },
   scrollContent: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
+    alignItems: 'center',
   },
   storyItem: {
     alignItems: 'center',
-    marginRight: 14,
-    width: 62,
+    marginRight: 16,
+    width: 66,
   },
-  myStoryContainer: {
+  myStoryWrapper: {
     position: 'relative',
-    padding: 2,
+    padding: 3,
+    borderRadius: 34,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   addBadge: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: Colors.primary,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    bottom: -2,
+    right: -2,
+    backgroundColor: '#00A8FF',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#17212B',
+    borderWidth: 2.5,
+    borderColor: '#0E1420',
+    shadowColor: '#00A8FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  storyRing: {
-    padding: 2.5,
-    borderRadius: 33,
+  storyRingWrapper: {
+    padding: 3,
+    borderRadius: 34,
+    borderWidth: 2,
   },
   unseenRing: {
-    borderWidth: 2.5,
-    borderColor: Colors.primary,
+    borderColor: '#00A8FF',
+    shadowColor: '#00A8FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.45,
+    shadowRadius: 5,
+    elevation: 3,
   },
   seenRing: {
-    borderWidth: 1.5,
-    borderColor: '#374252',
+    borderColor: 'rgba(255, 255, 255, 0.18)',
   },
   avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
   },
-  nameText: {
-    color: '#7F91A4',
-    fontSize: 11.5,
-    marginTop: 5,
+  myStoryText: {
+    color: '#8B9BB0',
+    fontSize: 11,
+    marginTop: 6,
     textAlign: 'center',
     fontWeight: '500',
+  },
+  nameText: {
+    color: '#8B9BB0',
+    fontSize: 11.5,
+    marginTop: 6,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  unseenNameText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
 });
