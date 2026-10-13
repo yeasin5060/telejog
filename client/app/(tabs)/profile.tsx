@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,8 +16,9 @@ import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { dummyUserProfile } from '@/assets/assets';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { logout, updateUserProfile } from '@/store/slices/authSlice';
 
-// Preset avatar options for quick selection
 const PRESET_AVATARS = [
   'https://i.pravatar.cc/150?img=68',
   'https://i.pravatar.cc/150?img=12',
@@ -29,29 +30,35 @@ const PRESET_AVATARS = [
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  // User Profile State
-  const [profile, setProfile] = useState({
-    name: dummyUserProfile.name,
-    phone: dummyUserProfile.phone,
-    handle: dummyUserProfile.handle,
-    bio: dummyUserProfile.bio,
-    avatar: dummyUserProfile.avatar,
-    lastSeen: dummyUserProfile.lastSeen,
-  });
+  const user = useAppSelector((state) => state.auth.user) || dummyUserProfile;
 
   // Edit Profile Form State
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editName, setEditName] = useState(profile.name);
-  const [editHandle, setEditHandle] = useState(profile.handle);
-  const [editBio, setEditBio] = useState(profile.bio);
-  const [editPhone, setEditPhone] = useState(profile.phone);
-  const [editAvatar, setEditAvatar] = useState(profile.avatar);
+  const [editName, setEditName] = useState(user.name);
+  const [editHandle, setEditHandle] = useState(user.handle);
+  const [editBio, setEditBio] = useState(user.bio || '');
+  const [editPhone, setEditPhone] = useState(user.phone || '');
+  const [editAvatar, setEditAvatar] = useState(user.avatar || PRESET_AVATARS[0]);
+
+  // Logout Confirmation Modal
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Settings State
   const [isNightMode, setIsNightMode] = useState(true);
   const [notifications, setNotifications] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      setEditName(user.name);
+      setEditHandle(user.handle);
+      setEditBio(user.bio || '');
+      setEditPhone(user.phone || '');
+      setEditAvatar(user.avatar || PRESET_AVATARS[0]);
+    }
+  }, [user]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -59,11 +66,11 @@ export default function ProfileScreen() {
   };
 
   const handleOpenEditModal = () => {
-    setEditName(profile.name);
-    setEditHandle(profile.handle);
-    setEditBio(profile.bio);
-    setEditPhone(profile.phone);
-    setEditAvatar(profile.avatar);
+    setEditName(user.name);
+    setEditHandle(user.handle);
+    setEditBio(user.bio || '');
+    setEditPhone(user.phone || '');
+    setEditAvatar(user.avatar || PRESET_AVATARS[0]);
     setShowEditModal(true);
   };
 
@@ -73,179 +80,208 @@ export default function ProfileScreen() {
       return;
     }
 
-    setProfile({
-      ...profile,
-      name: editName.trim(),
-      handle: editHandle.replace('@', '').trim(),
-      bio: editBio.trim(),
-      phone: editPhone.trim(),
-      avatar: editAvatar,
-    });
+    dispatch(
+      updateUserProfile({
+        name: editName.trim(),
+        handle: editHandle.replace('@', '').trim(),
+        bio: editBio.trim(),
+        phone: editPhone.trim(),
+        avatar: editAvatar,
+      })
+    );
 
     setShowEditModal(false);
     showToast('Profile updated successfully! ✨');
   };
 
+  const handleConfirmLogout = () => {
+    setShowLogoutModal(false);
+    showToast('Logging out...');
+    setTimeout(() => {
+      dispatch(logout());
+    }, 200);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Top Header */}
+      <View style={styles.topBar}>
+        <Text style={styles.topBarTitle}>Settings</Text>
+        <TouchableOpacity style={styles.editHeaderBtn} onPress={handleOpenEditModal} activeOpacity={0.7}>
+          <Ionicons name="create-outline" size={19} color="#00A8FF" style={{ marginRight: 4 }} />
+          <Text style={styles.editHeaderBtnText}>Edit</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Top Header Bar */}
-        <View style={styles.topBar}>
-          <Text style={styles.topBarTitle}>Profile</Text>
-          <TouchableOpacity style={styles.editHeaderBtn} onPress={handleOpenEditModal}>
-            <Ionicons name="pencil-outline" size={20} color="#2AABEE" style={{ marginRight: 4 }} />
-            <Text style={styles.editHeaderBtnText}>Edit</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Profile Cover & Avatar Header */}
+        {/* Profile Hero Section */}
         <View style={styles.header}>
-          <View style={styles.avatarWrapper}>
-            <Image source={{ uri: profile.avatar }} style={styles.avatar} />
-            <TouchableOpacity style={styles.cameraBtn} onPress={handleOpenEditModal}>
-              <Ionicons name="camera" size={16} color="#FFF" />
+          <View style={styles.avatarGlowWrapper}>
+            <Image source={{ uri: user.avatar || PRESET_AVATARS[0] }} style={styles.avatar} />
+            <TouchableOpacity style={styles.cameraBtn} onPress={handleOpenEditModal} activeOpacity={0.8}>
+              <Ionicons name="camera" size={15} color="#FFF" />
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.nameText}>{profile.name}</Text>
-          <Text style={styles.statusText}>{profile.lastSeen}</Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.nameText}>{user.name}</Text>
+            <Ionicons name="checkmark-circle" size={18} color="#00A8FF" style={{ marginLeft: 6 }} />
+          </View>
+          <Text style={styles.handleText}>@{user.handle}</Text>
+
+          <View style={styles.statusPill}>
+            <View style={styles.onlineDot} />
+            <Text style={styles.statusText}>Online</Text>
+          </View>
         </View>
 
-        {/* Account Info Card (Tappable to Edit) */}
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionHeader}>Account</Text>
-            <TouchableOpacity onPress={handleOpenEditModal}>
-              <Text style={styles.sectionHeaderEdit}>Edit</Text>
+        {/* Account Info Card */}
+        <View style={styles.sectionWrapper}>
+          <Text style={styles.sectionHeader}>ACCOUNT</Text>
+          <View style={styles.cardContainer}>
+            <TouchableOpacity style={styles.infoRow} onPress={handleOpenEditModal} activeOpacity={0.7}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(0, 168, 255, 0.15)' }]}>
+                <Ionicons name="call" size={18} color="#00A8FF" />
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoTitle}>{user.phone || '+880 1700-000000'}</Text>
+                <Text style={styles.infoSub}>Tap to change phone number</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color="#5E6F85" />
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <TouchableOpacity style={styles.infoRow} onPress={handleOpenEditModal} activeOpacity={0.7}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(168, 85, 247, 0.15)' }]}>
+                <Ionicons name="at" size={18} color="#A855F7" />
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoTitle}>@{user.handle}</Text>
+                <Text style={styles.infoSub}>Username</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color="#5E6F85" />
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <TouchableOpacity style={styles.infoRow} onPress={handleOpenEditModal} activeOpacity={0.7}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
+                <Ionicons name="information-circle" size={18} color="#22C55E" />
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoTitle}>{user.bio || 'Bio not set'}</Text>
+                <Text style={styles.infoSub}>Bio</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color="#5E6F85" />
             </TouchableOpacity>
           </View>
-
-          <TouchableOpacity style={styles.infoRow} onPress={handleOpenEditModal}>
-            <Ionicons name="call-outline" size={22} color="#2AABEE" />
-            <View style={styles.infoContent}>
-              <Text style={styles.infoTitle}>{profile.phone}</Text>
-              <Text style={styles.infoSub}>Tap to change phone number</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color="#4E5D6E" />
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.infoRow} onPress={handleOpenEditModal}>
-            <Ionicons name="at-outline" size={22} color="#2AABEE" />
-            <View style={styles.infoContent}>
-              <Text style={styles.infoTitle}>@{profile.handle}</Text>
-              <Text style={styles.infoSub}>Username</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color="#4E5D6E" />
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.infoRow} onPress={handleOpenEditModal}>
-            <Ionicons name="information-circle-outline" size={22} color="#2AABEE" />
-            <View style={styles.infoContent}>
-              <Text style={styles.infoTitle}>{profile.bio || 'No bio set'}</Text>
-              <Text style={styles.infoSub}>Bio</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color="#4E5D6E" />
-          </TouchableOpacity>
         </View>
 
         {/* Telegram Settings Options */}
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionHeader}>Settings</Text>
+        <View style={styles.sectionWrapper}>
+          <Text style={styles.sectionHeader}>SETTINGS</Text>
+          <View style={styles.cardContainer}>
+            {/* MANAGE DEVICES */}
+            <TouchableOpacity
+              style={styles.menuRow}
+              onPress={() => router.push('/devices')}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(0, 168, 255, 0.15)' }]}>
+                <Ionicons name="laptop-outline" size={18} color="#00A8FF" />
+              </View>
+              <View style={{ flex: 1, marginLeft: 14 }}>
+                <Text style={styles.menuTitle}>Devices</Text>
+                <Text style={styles.menuSubTitle}>Manage active sessions & desktop</Text>
+              </View>
+              <View style={styles.deviceBadge}>
+                <Text style={styles.deviceBadgeText}>5 active</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color="#5E6F85" />
+            </TouchableOpacity>
 
-          {/* MANAGE DEVICES MENU ITEM */}
-          <TouchableOpacity
-            style={styles.menuRow}
-            onPress={() => router.push('/devices')}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="laptop-outline" size={22} color="#2AABEE" />
-            <View style={{ flex: 1, marginLeft: 16 }}>
-              <Text style={styles.menuTitle}>Devices</Text>
-              <Text style={styles.menuSubTitle}>Manage active sessions & desktop</Text>
-            </View>
-            <View style={styles.deviceBadge}>
-              <Text style={styles.deviceBadgeText}>5 active</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color="#7F91A4" />
-          </TouchableOpacity>
+            <View style={styles.divider} />
 
-          <View style={styles.divider} />
+            <TouchableOpacity style={styles.menuRow} activeOpacity={0.7}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(56, 189, 248, 0.15)' }]}>
+                <Ionicons name="chatbubble-ellipses" size={18} color="#38BDF8" />
+              </View>
+              <Text style={styles.menuTitle}>Chat Settings</Text>
+              <Ionicons name="chevron-forward" size={16} color="#5E6F85" />
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuRow}>
-            <Ionicons name="chatbubble-ellipses-outline" size={22} color="#7F91A4" />
-            <Text style={styles.menuTitle}>Chat Settings</Text>
-            <Ionicons name="chevron-forward" size={18} color="#7F91A4" />
-          </TouchableOpacity>
+            <View style={styles.divider} />
 
-          <View style={styles.divider} />
+            <TouchableOpacity style={styles.menuRow} activeOpacity={0.7}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(234, 179, 8, 0.15)' }]}>
+                <Ionicons name="shield-checkmark" size={18} color="#EAB308" />
+              </View>
+              <Text style={styles.menuTitle}>Privacy and Security</Text>
+              <Ionicons name="chevron-forward" size={16} color="#5E6F85" />
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuRow}>
-            <Ionicons name="lock-closed-outline" size={22} color="#7F91A4" />
-            <Text style={styles.menuTitle}>Privacy and Security</Text>
-            <Ionicons name="chevron-forward" size={18} color="#7F91A4" />
-          </TouchableOpacity>
+            <View style={styles.divider} />
 
-          <View style={styles.divider} />
+            <TouchableOpacity style={styles.menuRow} activeOpacity={0.7}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(236, 72, 153, 0.15)' }]}>
+                <Ionicons name="notifications" size={18} color="#EC4899" />
+              </View>
+              <Text style={styles.menuTitle}>Notifications and Sounds</Text>
+              <Switch
+                value={notifications}
+                onValueChange={setNotifications}
+                trackColor={{ false: '#1D283E', true: '#00A8FF' }}
+                thumbColor="#FFF"
+              />
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuRow}>
-            <Ionicons name="notifications-outline" size={22} color="#7F91A4" />
-            <Text style={styles.menuTitle}>Notifications and Sounds</Text>
-            <Switch
-              value={notifications}
-              onValueChange={setNotifications}
-              trackColor={{ false: '#242F3D', true: '#2AABEE' }}
-              thumbColor="#FFF"
-            />
-          </TouchableOpacity>
+            <View style={styles.divider} />
 
-          <View style={styles.divider} />
+            <TouchableOpacity style={styles.menuRow} activeOpacity={0.7}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
+                <Ionicons name="folder-open" size={18} color="#3B82F6" />
+              </View>
+              <Text style={styles.menuTitle}>Data and Storage</Text>
+              <Ionicons name="chevron-forward" size={16} color="#5E6F85" />
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuRow}>
-            <Ionicons name="folder-open-outline" size={22} color="#7F91A4" />
-            <Text style={styles.menuTitle}>Data and Storage</Text>
-            <Ionicons name="chevron-forward" size={18} color="#7F91A4" />
-          </TouchableOpacity>
+            <View style={styles.divider} />
 
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.menuRow}>
-            <Ionicons name="moon-outline" size={22} color="#7F91A4" />
-            <Text style={styles.menuTitle}>Night Mode</Text>
-            <Switch
-              value={isNightMode}
-              onValueChange={setIsNightMode}
-              trackColor={{ false: '#242F3D', true: '#2AABEE' }}
-              thumbColor="#FFF"
-            />
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.menuRow}>
-            <Ionicons name="globe-outline" size={22} color="#7F91A4" />
-            <Text style={styles.menuTitle}>Language</Text>
-            <Text style={styles.menuBadgeText}>English / বাংলা</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.menuRow} activeOpacity={0.7}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(99, 102, 241, 0.15)' }]}>
+                <Ionicons name="moon" size={18} color="#6366F1" />
+              </View>
+              <Text style={styles.menuTitle}>Night Mode</Text>
+              <Switch
+                value={isNightMode}
+                onValueChange={setIsNightMode}
+                trackColor={{ false: '#1D283E', true: '#00A8FF' }}
+                thumbColor="#FFF"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Telejog Premium Banner */}
+        {/* Telejog Premium Luxury Card */}
         <TouchableOpacity style={styles.premiumCard} activeOpacity={0.85}>
-          <MaterialCommunityIcons name="star-circle" size={32} color="#FFD700" />
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.premiumTitle}>Telejog Premium</Text>
-            <Text style={styles.premiumSub}>Unlock animated emojis, 4GB file uploads & faster downloads.</Text>
+          <View style={styles.premiumIconBox}>
+            <MaterialCommunityIcons name="star-four-points" size={26} color="#FFD700" />
           </View>
+          <View style={{ flex: 1, marginLeft: 14 }}>
+            <Text style={styles.premiumTitle}>Telejog Premium</Text>
+            <Text style={styles.premiumSub}>Unlock animated emojis, 4GB cloud storage & faster downloads.</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="#FFD700" />
         </TouchableOpacity>
 
-        {/* Logout */}
+        {/* Logout Button */}
         <TouchableOpacity
           style={styles.logoutBtn}
-          onPress={() => showToast('Logging out...')}
+          activeOpacity={0.8}
+          onPress={() => setShowLogoutModal(true)}
         >
+          <Ionicons name="log-out-outline" size={20} color="#FF4757" style={{ marginRight: 8 }} />
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
 
@@ -257,6 +293,44 @@ export default function ProfileScreen() {
         <View style={styles.toastContainer}>
           <Text style={styles.toastText}>{toastMessage}</Text>
         </View>
+      )}
+
+      {/* LOGOUT CONFIRMATION MODAL */}
+      {showLogoutModal && (
+        <Modal
+          visible={showLogoutModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowLogoutModal(false)}
+        >
+          <View style={styles.alertOverlay}>
+            <View style={styles.alertCard}>
+              <View style={styles.alertIconBox}>
+                <Ionicons name="log-out-outline" size={34} color="#FF4757" />
+              </View>
+              <Text style={styles.alertTitle}>Log Out of Telejog?</Text>
+              <Text style={styles.alertSub}>
+                Are you sure you want to log out? You can easily log back in using your phone number anytime.
+              </Text>
+
+              <View style={styles.alertButtonsRow}>
+                <TouchableOpacity
+                  style={styles.alertCancelBtn}
+                  onPress={() => setShowLogoutModal(false)}
+                >
+                  <Text style={styles.alertCancelText}>Cancel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.alertConfirmBtn}
+                  onPress={handleConfirmLogout}
+                >
+                  <Text style={styles.alertConfirmText}>Log Out</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       )}
 
       {/* EDIT PROFILE MODAL */}
@@ -290,7 +364,7 @@ export default function ProfileScreen() {
                 {/* Avatar Preview & Presets */}
                 <View style={styles.avatarEditContainer}>
                   <Image source={{ uri: editAvatar }} style={styles.editAvatarImage} />
-                  <Text style={styles.chooseAvatarLabel}>Choose Avatar</Text>
+                  <Text style={styles.chooseAvatarLabel}>Select Avatar</Text>
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -325,7 +399,7 @@ export default function ProfileScreen() {
                       value={editName}
                       onChangeText={setEditName}
                       placeholder="Your Name"
-                      placeholderTextColor="#7F91A4"
+                      placeholderTextColor="#5E6F85"
                     />
                   </View>
 
@@ -340,7 +414,7 @@ export default function ProfileScreen() {
                         value={editHandle}
                         onChangeText={setEditHandle}
                         placeholder="username"
-                        placeholderTextColor="#7F91A4"
+                        placeholderTextColor="#5E6F85"
                         autoCapitalize="none"
                       />
                     </View>
@@ -355,7 +429,7 @@ export default function ProfileScreen() {
                       value={editPhone}
                       onChangeText={setEditPhone}
                       placeholder="+880 1700-000000"
-                      placeholderTextColor="#7F91A4"
+                      placeholderTextColor="#5E6F85"
                       keyboardType="phone-pad"
                     />
                   </View>
@@ -371,8 +445,8 @@ export default function ProfileScreen() {
                       style={[styles.formInput, styles.bioInput]}
                       value={editBio}
                       onChangeText={(txt) => setEditBio(txt.slice(0, 70))}
-                      placeholder="Any details such as age, occupation or city."
-                      placeholderTextColor="#7F91A4"
+                      placeholder="Bio description"
+                      placeholderTextColor="#5E6F85"
                       multiline
                     />
                   </View>
@@ -401,198 +475,261 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0E1621',
+    backgroundColor: '#0B0F17',
   },
   container: {
     flex: 1,
   },
   topBar: {
-    height: 52,
-    backgroundColor: '#17212B',
+    height: 54,
+    backgroundColor: '#0B0F17',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#101721',
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
   },
   topBarTitle: {
     color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 19,
+    fontWeight: '800',
+    letterSpacing: 0.3,
   },
   editHeaderBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 6,
+    backgroundColor: 'rgba(0, 168, 255, 0.12)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
   editHeaderBtnText: {
-    color: '#2AABEE',
-    fontSize: 15,
-    fontWeight: 'bold',
+    color: '#00A8FF',
+    fontSize: 14,
+    fontWeight: '700',
   },
   header: {
     alignItems: 'center',
     paddingVertical: 24,
-    backgroundColor: '#17212B',
+    backgroundColor: '#0E1420',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
   },
-  avatarWrapper: {
+  avatarGlowWrapper: {
     position: 'relative',
+    padding: 3,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#00A8FF',
+    shadowColor: '#00A8FF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6,
   },
   avatar: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    borderWidth: 2,
-    borderColor: '#2AABEE',
+    backgroundColor: '#141C2B',
   },
   cameraBtn: {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#2AABEE',
+    backgroundColor: '#00A8FF',
     width: 28,
     height: 28,
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#17212B',
+    borderWidth: 2.5,
+    borderColor: '#0E1420',
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
   },
   nameText: {
     color: '#FFF',
     fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 12,
+    fontWeight: '800',
   },
-  statusText: {
-    color: '#40A7E3',
-    fontSize: 13,
+  handleText: {
+    color: '#8B9BB0',
+    fontSize: 14,
     marginTop: 2,
   },
-  sectionCard: {
-    backgroundColor: '#17212B',
-    marginTop: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  sectionHeaderRow: {
+  statusPill: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 230, 118, 0.25)',
+  },
+  onlineDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#00E676',
+    marginRight: 6,
+  },
+  statusText: {
+    color: '#00E676',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  sectionWrapper: {
+    marginTop: 20,
+    paddingHorizontal: 16,
   },
   sectionHeader: {
-    color: '#2AABEE',
-    fontSize: 14,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
+    color: '#00A8FF',
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    marginBottom: 8,
+    marginLeft: 4,
   },
-  sectionHeaderEdit: {
-    color: '#2AABEE',
-    fontSize: 13,
-    fontWeight: '600',
+  cardContainer: {
+    backgroundColor: '#141C2B',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    overflow: 'hidden',
+  },
+  iconBox: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 13,
   },
   infoContent: {
-    marginLeft: 16,
+    marginLeft: 14,
     flex: 1,
   },
   infoTitle: {
     color: '#FFF',
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   infoSub: {
-    color: '#7F91A4',
+    color: '#5E6F85',
     fontSize: 12,
-    marginTop: 2,
+    marginTop: 1,
   },
   menuRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 13,
   },
   menuTitle: {
     color: '#FFF',
     fontSize: 15,
-    marginLeft: 16,
+    marginLeft: 14,
     flex: 1,
+    fontWeight: '500',
   },
   menuSubTitle: {
-    color: '#7F91A4',
+    color: '#5E6F85',
     fontSize: 12,
-    marginTop: 2,
+    marginTop: 1,
   },
   deviceBadge: {
-    backgroundColor: 'rgba(42, 171, 238, 0.15)',
+    backgroundColor: 'rgba(0, 168, 255, 0.15)',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 12,
+    borderRadius: 10,
     marginRight: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 168, 255, 0.3)',
   },
   deviceBadgeText: {
-    color: '#2AABEE',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  menuBadgeText: {
-    color: '#7F91A4',
-    fontSize: 13,
+    color: '#00A8FF',
+    fontSize: 11.5,
+    fontWeight: '700',
   },
   divider: {
-    height: 0.5,
-    backgroundColor: '#101721',
-    marginLeft: 38,
+    height: 0.6,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    marginLeft: 64,
   },
   premiumCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#242F3D',
+    backgroundColor: '#172133',
     marginHorizontal: 16,
-    marginTop: 16,
+    marginTop: 20,
     padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 215, 0, 0.3)',
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 215, 0, 0.35)',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  premiumIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   premiumTitle: {
     color: '#FFD700',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '800',
   },
   premiumSub: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 12,
     marginTop: 2,
+    lineHeight: 16,
   },
   logoutBtn: {
-    marginHorizontal: 16,
-    marginTop: 20,
-    backgroundColor: 'rgba(229, 57, 53, 0.15)',
-    paddingVertical: 14,
-    borderRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 24,
+    backgroundColor: 'rgba(255, 71, 87, 0.12)',
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 71, 87, 0.25)',
   },
   logoutText: {
-    color: '#E53935',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#FF4757',
+    fontSize: 15,
+    fontWeight: '700',
   },
   toastContainer: {
     position: 'absolute',
     top: 60,
     alignSelf: 'center',
-    backgroundColor: 'rgba(23, 33, 43, 0.95)',
+    backgroundColor: 'rgba(20, 28, 43, 0.95)',
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#2AABEE',
+    borderColor: '#00A8FF',
     zIndex: 999,
   },
   toastText: {
@@ -606,23 +743,23 @@ const styles = StyleSheet.create({
   },
   editProfileSheet: {
     flex: 1,
-    backgroundColor: '#0E1621',
+    backgroundColor: '#0B0F17',
   },
   editModalHeader: {
     height: 56,
-    backgroundColor: '#17212B',
+    backgroundColor: '#0E1420',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#101721',
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
   },
   cancelModalBtn: {
     padding: 6,
   },
   cancelModalBtnText: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 15,
   },
   editModalTitle: {
@@ -634,7 +771,7 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   saveModalBtnText: {
-    color: '#2AABEE',
+    color: '#00A8FF',
     fontSize: 15,
     fontWeight: 'bold',
   },
@@ -643,25 +780,26 @@ const styles = StyleSheet.create({
   },
   avatarEditContainer: {
     alignItems: 'center',
-    paddingVertical: 20,
-    backgroundColor: '#17212B',
+    paddingVertical: 22,
+    backgroundColor: '#0E1420',
     borderBottomWidth: 1,
-    borderBottomColor: '#101721',
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
   },
   editAvatarImage: {
     width: 90,
     height: 90,
     borderRadius: 45,
     borderWidth: 2,
-    borderColor: '#2AABEE',
+    borderColor: '#00A8FF',
     marginBottom: 10,
   },
   chooseAvatarLabel: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     textTransform: 'uppercase',
     marginBottom: 10,
+    letterSpacing: 0.5,
   },
   avatarPresetsScroll: {
     flexDirection: 'row',
@@ -674,7 +812,7 @@ const styles = StyleSheet.create({
   },
   presetAvatarBtnSelected: {
     borderWidth: 2,
-    borderColor: '#2AABEE',
+    borderColor: '#00A8FF',
   },
   presetAvatarThumb: {
     width: 52,
@@ -685,7 +823,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#2AABEE',
+    backgroundColor: '#00A8FF',
     width: 18,
     height: 18,
     borderRadius: 9,
@@ -693,18 +831,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editFormCard: {
-    backgroundColor: '#17212B',
-    marginTop: 16,
+    backgroundColor: '#141C2B',
+    marginTop: 18,
+    marginHorizontal: 16,
+    borderRadius: 16,
     paddingHorizontal: 16,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#101721',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   inputFieldGroup: {
     paddingVertical: 12,
   },
   inputLabel: {
-    color: '#2AABEE',
+    color: '#00A8FF',
     fontSize: 12,
     fontWeight: 'bold',
     marginBottom: 4,
@@ -714,13 +853,21 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 15,
     paddingVertical: 4,
+    ...(Platform.OS === 'web'
+      ? ({
+          outlineStyle: 'none',
+          outlineWidth: 0,
+          outlineColor: 'transparent',
+          boxShadow: 'none',
+        } as any)
+      : {}),
   },
   handleInputRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   atPrefix: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 16,
     marginRight: 4,
   },
@@ -729,26 +876,100 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   bioCounterText: {
-    color: '#7F91A4',
+    color: '#5E6F85',
     fontSize: 11,
   },
   fieldDivider: {
-    height: 0.5,
-    backgroundColor: '#101721',
+    height: 0.6,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   saveProfileLargeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2AABEE',
+    backgroundColor: '#00A8FF',
     marginHorizontal: 16,
     marginTop: 24,
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: 14,
+    shadowColor: '#00A8FF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
   },
   saveProfileLargeBtnText: {
     color: '#FFF',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  alertOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  alertCard: {
+    width: '88%',
+    maxWidth: 320,
+    backgroundColor: '#141C2B',
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  alertIconBox: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255, 71, 87, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  alertTitle: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  alertSub: {
+    color: '#8B9BB0',
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 20,
+  },
+  alertButtonsRow: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 10,
+  },
+  alertCancelBtn: {
+    flex: 1,
+    backgroundColor: '#1E283E',
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  alertCancelText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  alertConfirmBtn: {
+    flex: 1,
+    backgroundColor: '#FF4757',
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  alertConfirmText: {
+    color: '#FFF',
+    fontSize: 14,
     fontWeight: 'bold',
   },
 });

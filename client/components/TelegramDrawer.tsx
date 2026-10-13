@@ -4,6 +4,8 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { dummyUserProfile } from '@/assets/assets';
 import { useRouter } from 'expo-router';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { logout } from '@/store/slices/authSlice';
 
 interface Props {
   visible: boolean;
@@ -14,12 +16,19 @@ interface Props {
 
 export default function TelegramDrawer({ visible, onClose, isDarkMode, onToggleDarkMode }: Props) {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user) || dummyUserProfile;
 
   if (!visible) return null;
 
   const navigateTo = (path: string) => {
     onClose();
     router.push(path as any);
+  };
+
+  const handleLogout = () => {
+    onClose();
+    dispatch(logout());
   };
 
   return (
@@ -33,7 +42,7 @@ export default function TelegramDrawer({ visible, onClose, isDarkMode, onToggleD
           {/* Header Profile Info */}
           <View style={[styles.headerContainer, { backgroundColor: isDarkMode ? '#242F3D' : '#517DA2' }]}>
             <View style={styles.headerTop}>
-              <Image source={{ uri: dummyUserProfile.avatar }} style={styles.avatar} />
+              <Image source={{ uri: user.avatar || dummyUserProfile.avatar }} style={styles.avatar} />
               <TouchableOpacity onPress={onToggleDarkMode} style={styles.themeToggle}>
                 <Ionicons
                   name={isDarkMode ? "sunny" : "moon"}
@@ -43,9 +52,9 @@ export default function TelegramDrawer({ visible, onClose, isDarkMode, onToggleD
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.profileName}>{dummyUserProfile.name}</Text>
-            <Text style={styles.profilePhone}>{dummyUserProfile.phone}</Text>
-            <Text style={styles.profileHandle}>@{dummyUserProfile.handle}</Text>
+            <Text style={styles.profileName}>{user.name}</Text>
+            <Text style={styles.profilePhone}>{user.phone || dummyUserProfile.phone}</Text>
+            <Text style={styles.profileHandle}>@{user.handle || dummyUserProfile.handle}</Text>
           </View>
 
           {/* Drawer Menu Options */}
@@ -95,6 +104,11 @@ export default function TelegramDrawer({ visible, onClose, isDarkMode, onToggleD
             <TouchableOpacity style={styles.menuItem} onPress={() => onClose()}>
               <Ionicons name="help-circle-outline" size={22} color={isDarkMode ? '#7F91A4' : '#707579'} />
               <Text style={[styles.menuText, { color: isDarkMode ? '#FFF' : '#000' }]}>Telejog Features & FAQ</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+              <Ionicons name="log-out-outline" size={22} color="#E53935" />
+              <Text style={[styles.menuText, { color: '#E53935' }]}>Log Out</Text>
             </TouchableOpacity>
 
             <View style={styles.versionContainer}>

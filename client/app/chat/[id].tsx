@@ -12,10 +12,9 @@ import {
   Platform,
   Modal,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { dummyConversationData, dummyMessagesMap } from '@/assets/assets';
 import { Message } from '@/types';
@@ -56,7 +55,7 @@ export default function ChatScreen() {
     : conversation.type === 'group'
     ? `${conversation.membersCount} members`
     : isOnline
-    ? 'Online'
+    ? 'online'
     : conversation.participant?.lastSeen || 'last seen recently';
 
   const [messages, setMessages] = useState<Message[]>(
@@ -140,7 +139,6 @@ export default function ChatScreen() {
           if (existingIndex > -1) {
             const existing = reactions[existingIndex];
             if (existing.userReacted) {
-              // User already reacted -> remove their reaction
               if (existing.count <= 1) {
                 reactions.splice(existingIndex, 1);
               } else {
@@ -151,7 +149,6 @@ export default function ChatScreen() {
                 };
               }
             } else {
-              // User adds reaction
               reactions[existingIndex] = {
                 ...existing,
                 count: existing.count + 1,
@@ -159,7 +156,6 @@ export default function ChatScreen() {
               };
             }
           } else {
-            // New reaction emoji
             reactions.push({ emoji, count: 1, userReacted: true });
           }
           return { ...msg, reactions };
@@ -172,7 +168,6 @@ export default function ChatScreen() {
     setShowFullEmojiModal(false);
   };
 
-  // Start replying to a message
   const handleStartReply = (msg: Message) => {
     setReplyingTo(msg);
     setSelectedMsgForMenu(null);
@@ -182,7 +177,6 @@ export default function ChatScreen() {
     }, 150);
   };
 
-  // Scroll to original message when tapping replyBox in bubble
   const handleScrollToRepliedMessage = (repliedMsgId: string) => {
     const targetIndex = messages.findIndex((m) => m._id === repliedMsgId);
     if (targetIndex !== -1) {
@@ -198,29 +192,26 @@ export default function ChatScreen() {
     }
   };
 
-  // Copy text to clipboard simulation
   const handleCopyMessage = (msg: Message) => {
     setSelectedMsgForMenu(null);
     if (typeof navigator !== 'undefined' && navigator.clipboard && msg.text) {
       navigator.clipboard.writeText(msg.text).catch(() => {});
     }
-    showToast('Text copied to clipboard');
+    showToast('Copied to clipboard');
   };
 
-  // Delete message
   const handleDeleteMessage = (msgId: string) => {
     setMessages((prev) => prev.filter((m) => m._id !== msgId));
     setSelectedMsgForMenu(null);
     showToast('Message deleted');
   };
 
-  // Pin message
   const handlePinMessage = (msg: Message) => {
     setMessages((prev) =>
       prev.map((m) => (m._id === msg._id ? { ...m, pinned: !m.pinned } : m))
     );
     setSelectedMsgForMenu(null);
-    showToast(msg.pinned ? 'Message unpinned' : 'Message pinned to top');
+    showToast(msg.pinned ? 'Unpinned' : 'Pinned to top');
   };
 
   const renderMessageItem = ({ item }: { item: Message }) => {
@@ -236,7 +227,7 @@ export default function ChatScreen() {
         ]}
       >
         <TouchableOpacity
-          activeOpacity={0.88}
+          activeOpacity={0.9}
           onLongPress={() => setSelectedMsgForMenu(item)}
           style={[
             styles.bubble,
@@ -247,12 +238,12 @@ export default function ChatScreen() {
           {/* Pinned Badge */}
           {item.pinned && (
             <View style={styles.pinnedBadge}>
-              <Ionicons name="pin" size={11} color="#2AABEE" />
-              <Text style={styles.pinnedText}>Pinned</Text>
+              <Ionicons name="pin" size={11} color="#00A8FF" />
+              <Text style={styles.pinnedText}>Pinned message</Text>
             </View>
           )}
 
-          {/* Reply Reference if available */}
+          {/* Reply Reference Box */}
           {item.replyTo && (
             <TouchableOpacity
               activeOpacity={0.7}
@@ -266,7 +257,7 @@ export default function ChatScreen() {
                   {item.replyTo.text}
                 </Text>
               </View>
-              <Ionicons name="arrow-undo" size={12} color="#2AABEE" style={{ marginLeft: 4 }} />
+              <Ionicons name="arrow-undo" size={12} color="#00A8FF" style={{ marginLeft: 4 }} />
             </TouchableOpacity>
           )}
 
@@ -277,20 +268,21 @@ export default function ChatScreen() {
             </TouchableOpacity>
           )}
 
-          {/* Voice Note Attachment */}
+          {/* Voice Note Attachment with Neon Waveform */}
           {item.mediaType === 'voice' && (
             <View style={styles.voiceContainer}>
               <TouchableOpacity style={styles.playBtn}>
-                <Ionicons name="play" size={18} color="#FFF" />
+                <Ionicons name="play" size={17} color="#FFF" style={{ marginLeft: 2 }} />
               </TouchableOpacity>
               <View style={styles.waveformBox}>
-                <View style={[styles.waveLine, { height: 12 }]} />
-                <View style={[styles.waveLine, { height: 20 }]} />
-                <View style={[styles.waveLine, { height: 8 }]} />
-                <View style={[styles.waveLine, { height: 24 }]} />
-                <View style={[styles.waveLine, { height: 16 }]} />
                 <View style={[styles.waveLine, { height: 10 }]} />
                 <View style={[styles.waveLine, { height: 22 }]} />
+                <View style={[styles.waveLine, { height: 8 }]} />
+                <View style={[styles.waveLine, { height: 26 }]} />
+                <View style={[styles.waveLine, { height: 16 }]} />
+                <View style={[styles.waveLine, { height: 12 }]} />
+                <View style={[styles.waveLine, { height: 20 }]} />
+                <View style={[styles.waveLine, { height: 14 }]} />
               </View>
               <Text style={styles.voiceDuration}>{item.voiceDuration || '0:15'}</Text>
             </View>
@@ -306,13 +298,13 @@ export default function ChatScreen() {
               <Ionicons
                 name={item.read ? 'checkmark-done' : 'checkmark'}
                 size={14}
-                color="#2AABEE"
-                style={{ marginLeft: 3 }}
+                color="#00A8FF"
+                style={{ marginLeft: 4 }}
               />
             )}
           </View>
 
-          {/* Reactions Bar on Bubble */}
+          {/* Reactions Row */}
           {item.reactions && item.reactions.length > 0 && (
             <View style={styles.reactionsRow}>
               {item.reactions.map((r, i) => (
@@ -340,13 +332,13 @@ export default function ChatScreen() {
           )}
         </TouchableOpacity>
 
-        {/* Quick inline swipe/tap reply icon */}
+        {/* Quick inline reply action icon */}
         <TouchableOpacity
           style={styles.quickReplyActionBtn}
           onPress={() => handleStartReply(item)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Ionicons name="return-up-back" size={16} color="#4E5D6E" />
+          <Ionicons name="return-up-back" size={16} color="#5E6F85" />
         </TouchableOpacity>
       </View>
     );
@@ -358,19 +350,22 @@ export default function ChatScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        {/* Telegram Chat Header */}
+        {/* Modern Telegram Chat Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color="#FFF" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.headerProfile} activeOpacity={0.8}>
-            <Image source={{ uri: participantAvatar }} style={styles.headerAvatar} />
+            <View style={styles.headerAvatarContainer}>
+              <Image source={{ uri: participantAvatar }} style={styles.headerAvatar} />
+              {isOnline && <View style={styles.headerOnlineDot} />}
+            </View>
             <View style={styles.headerInfo}>
               <Text style={styles.headerName} numberOfLines={1}>
                 {participantName}
               </Text>
-              <Text style={[styles.headerStatus, isOnline && { color: '#40A7E3' }]}>
+              <Text style={[styles.headerStatus, isOnline && styles.headerStatusOnline]}>
                 {statusText}
               </Text>
             </View>
@@ -378,13 +373,13 @@ export default function ChatScreen() {
 
           <View style={styles.headerActions}>
             <TouchableOpacity style={styles.iconBtn}>
-              <Ionicons name="call-outline" size={22} color="#FFF" />
+              <Ionicons name="call-outline" size={20} color="#FFF" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconBtn}>
-              <Ionicons name="videocam-outline" size={22} color="#FFF" />
+              <Ionicons name="videocam-outline" size={20} color="#FFF" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconBtn}>
-              <Ionicons name="ellipsis-vertical" size={20} color="#FFF" />
+              <Ionicons name="ellipsis-vertical" size={18} color="#FFF" />
             </TouchableOpacity>
           </View>
         </View>
@@ -405,6 +400,7 @@ export default function ChatScreen() {
             renderItem={renderMessageItem}
             contentContainerStyle={styles.messagesList}
             onScrollToIndexFailed={() => {}}
+            showsVerticalScrollIndicator={false}
           />
         </View>
 
@@ -419,7 +415,7 @@ export default function ChatScreen() {
         {replyingTo && (
           <View style={styles.replyPreviewBar}>
             <View style={styles.replyPreviewLine} />
-            <Ionicons name="arrow-undo" size={20} color="#2AABEE" style={{ marginHorizontal: 8 }} />
+            <Ionicons name="arrow-undo" size={18} color="#00A8FF" style={{ marginHorizontal: 8 }} />
             <View style={styles.replyPreviewContent}>
               <Text style={styles.replyPreviewSender} numberOfLines={1}>
                 Reply to {replyingTo.sender === 'current_user' ? 'You' : participantName}
@@ -438,7 +434,7 @@ export default function ChatScreen() {
               onPress={() => setReplyingTo(null)}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Ionicons name="close" size={20} color="#7F91A4" />
+              <Ionicons name="close" size={20} color="#8B9BB0" />
             </TouchableOpacity>
           </View>
         )}
@@ -446,14 +442,22 @@ export default function ChatScreen() {
         {/* Telegram Input Bar */}
         <View style={styles.inputBar}>
           <TouchableOpacity style={styles.attachmentBtn}>
-            <Ionicons name="attach-outline" size={24} color="#7F91A4" />
+            <Ionicons name="attach-outline" size={24} color="#8B9BB0" />
           </TouchableOpacity>
 
           <TextInput
             ref={inputRef}
             placeholder={replyingTo ? 'Write a reply...' : 'Message...'}
-            placeholderTextColor="#7F91A4"
-            style={styles.textInput}
+            placeholderTextColor="#5E6F85"
+            style={[
+              styles.textInput,
+              Platform.OS === 'web' && ({
+                outlineStyle: 'none',
+                outlineWidth: 0,
+                outlineColor: 'transparent',
+                boxShadow: 'none',
+              } as any),
+            ]}
             value={inputText}
             onChangeText={setInputText}
             multiline
@@ -466,22 +470,22 @@ export default function ChatScreen() {
             <Ionicons
               name={showInputEmojiTray ? 'keypad-outline' : 'happy-outline'}
               size={24}
-              color={showInputEmojiTray ? '#2AABEE' : '#7F91A4'}
+              color={showInputEmojiTray ? '#00A8FF' : '#8B9BB0'}
             />
           </TouchableOpacity>
 
           {inputText.trim().length > 0 ? (
             <TouchableOpacity style={styles.sendBtn} onPress={handleSendMessage}>
-              <Ionicons name="send" size={18} color="#FFF" />
+              <Ionicons name="send" size={17} color="#FFF" />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity style={styles.micBtn}>
-              <Ionicons name="mic-outline" size={22} color="#FFF" />
+              <Ionicons name="mic-outline" size={21} color="#FFF" />
             </TouchableOpacity>
           )}
         </View>
 
-        {/* IN-APP EMOJI TRAY (When happy icon tapped in input bar) */}
+        {/* IN-APP EMOJI TRAY */}
         {showInputEmojiTray && (
           <View style={styles.inputEmojiTray}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.emojiTrayScroll}>
@@ -533,25 +537,23 @@ export default function ChatScreen() {
                       style={styles.allEmojisBtn}
                       onPress={() => setShowFullEmojiModal(true)}
                     >
-                      <Ionicons name="add" size={20} color="#2AABEE" />
+                      <Ionicons name="add" size={20} color="#00A8FF" />
                     </TouchableOpacity>
                   </ScrollView>
                 </View>
 
                 {/* 2. TELEGRAM MESSAGE ACTIONS MENU */}
                 <View style={styles.menuActionsCard}>
-                  {/* Reply Button */}
                   <TouchableOpacity
                     style={styles.menuActionRow}
                     onPress={() => handleStartReply(selectedMsgForMenu)}
                   >
-                    <Ionicons name="arrow-undo-outline" size={20} color="#2AABEE" />
+                    <Ionicons name="arrow-undo-outline" size={20} color="#00A8FF" />
                     <Text style={styles.menuActionText}>Reply</Text>
                   </TouchableOpacity>
 
                   <View style={styles.menuDivider} />
 
-                  {/* Copy Button */}
                   {selectedMsgForMenu.text && (
                     <>
                       <TouchableOpacity
@@ -565,7 +567,6 @@ export default function ChatScreen() {
                     </>
                   )}
 
-                  {/* Pin Message Button */}
                   <TouchableOpacity
                     style={styles.menuActionRow}
                     onPress={() => handlePinMessage(selectedMsgForMenu)}
@@ -582,7 +583,6 @@ export default function ChatScreen() {
 
                   <View style={styles.menuDivider} />
 
-                  {/* Forward Message Button */}
                   <TouchableOpacity
                     style={styles.menuActionRow}
                     onPress={() => {
@@ -596,13 +596,12 @@ export default function ChatScreen() {
 
                   <View style={styles.menuDivider} />
 
-                  {/* Delete Message Button */}
                   <TouchableOpacity
                     style={styles.menuActionRow}
                     onPress={() => handleDeleteMessage(selectedMsgForMenu._id)}
                   >
-                    <Ionicons name="trash-outline" size={20} color="#E53935" />
-                    <Text style={[styles.menuActionText, { color: '#E53935' }]}>Delete</Text>
+                    <Ionicons name="trash-outline" size={20} color="#FF4757" />
+                    <Text style={[styles.menuActionText, { color: '#FF4757' }]}>Delete</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -620,7 +619,6 @@ export default function ChatScreen() {
           >
             <View style={styles.fullEmojiOverlay}>
               <View style={styles.fullEmojiSheet}>
-                {/* Header */}
                 <View style={styles.fullEmojiHeader}>
                   <Text style={styles.fullEmojiTitle}>Choose Reaction</Text>
                   <TouchableOpacity
@@ -631,7 +629,6 @@ export default function ChatScreen() {
                   </TouchableOpacity>
                 </View>
 
-                {/* Categories & Emojis */}
                 <ScrollView style={styles.fullEmojiScroll} showsVerticalScrollIndicator={false}>
                   {EMOJI_CATEGORIES.map((category) => (
                     <View key={category.name} style={styles.categorySection}>
@@ -678,16 +675,16 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#17212B',
+    backgroundColor: '#0E1420',
   },
   header: {
     height: 58,
-    backgroundColor: '#17212B',
+    backgroundColor: '#0E1420',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#101721',
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
   },
   backBtn: {
     padding: 6,
@@ -698,10 +695,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 8,
   },
+  headerAvatarContainer: {
+    position: 'relative',
+  },
   headerAvatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#172133',
+  },
+  headerOnlineDot: {
+    position: 'absolute',
+    bottom: -1,
+    right: -1,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#00E676',
+    borderWidth: 2,
+    borderColor: '#0E1420',
   },
   headerInfo: {
     marginLeft: 10,
@@ -710,37 +722,49 @@ const styles = StyleSheet.create({
   headerName: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   headerStatus: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 12,
+    marginTop: 1,
+  },
+  headerStatusOnline: {
+    color: '#00E676',
+    fontWeight: '500',
   },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   iconBtn: {
-    padding: 6,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginLeft: 6,
   },
   chatBackground: {
     flex: 1,
-    backgroundColor: '#0E1621',
+    backgroundColor: '#0B0F17',
   },
   dateChipContainer: {
     alignItems: 'center',
-    marginVertical: 10,
+    marginVertical: 12,
   },
   dateChip: {
-    backgroundColor: 'rgba(23, 33, 43, 0.8)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: 'rgba(23, 33, 51, 0.85)',
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   dateChipText: {
-    color: '#7F91A4',
-    fontSize: 12,
+    color: '#8B9BB0',
+    fontSize: 11.5,
     fontWeight: '600',
   },
   messagesList: {
@@ -762,35 +786,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   msgRowHighlighted: {
-    backgroundColor: 'rgba(42, 171, 238, 0.12)',
+    backgroundColor: 'rgba(0, 168, 255, 0.14)',
     borderRadius: 14,
     padding: 2,
   },
   quickReplyActionBtn: {
     padding: 6,
-    opacity: 0.6,
+    opacity: 0.5,
   },
   bubble: {
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 2,
     maxWidth: '100%',
   },
   bubbleRight: {
-    backgroundColor: '#2B5278',
-    borderBottomRightRadius: 2,
+    backgroundColor: '#174A7A',
+    borderBottomRightRadius: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 168, 255, 0.25)',
   },
   bubbleLeft: {
-    backgroundColor: '#182533',
-    borderBottomLeftRadius: 2,
+    backgroundColor: '#141C2B',
+    borderBottomLeftRadius: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   bubbleHighlighted: {
     borderWidth: 1.5,
-    borderColor: '#2AABEE',
+    borderColor: '#00A8FF',
   },
   pinnedBadge: {
     flexDirection: 'row',
@@ -798,40 +826,38 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   pinnedText: {
-    color: '#2AABEE',
+    color: '#00A8FF',
     fontSize: 10,
     fontWeight: 'bold',
     marginLeft: 4,
   },
   msgText: {
-    color: '#FFF',
+    color: '#FFFFFF',
     fontSize: 15,
-    lineHeight: 20,
+    lineHeight: 21,
   },
   attachmentImg: {
     width: 230,
     height: 160,
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 6,
   },
   replyBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.22)',
+    backgroundColor: 'rgba(0,0,0,0.25)',
     paddingVertical: 5,
     paddingHorizontal: 8,
     borderRadius: 6,
     marginBottom: 6,
+    borderLeftWidth: 3,
+    borderLeftColor: '#00A8FF',
   },
   replyBarAccent: {
-    width: 3,
-    backgroundColor: '#2AABEE',
-    height: '100%',
-    borderRadius: 2,
-    marginRight: 8,
+    width: 0,
   },
   replySender: {
-    color: '#2AABEE',
+    color: '#00A8FF',
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -842,16 +868,21 @@ const styles = StyleSheet.create({
   voiceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: 180,
+    width: 190,
     marginVertical: 4,
   },
   playBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#2AABEE',
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#00A8FF',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#00A8FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 3,
   },
   waveformBox: {
     flex: 1,
@@ -862,12 +893,13 @@ const styles = StyleSheet.create({
   },
   waveLine: {
     width: 3,
-    backgroundColor: '#40A7E3',
+    backgroundColor: '#00C6FF',
     borderRadius: 2,
   },
   voiceDuration: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 11,
+    fontWeight: '500',
   },
   msgFooter: {
     flexDirection: 'row',
@@ -876,7 +908,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   msgTime: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 11,
   },
   reactionsRow: {
@@ -896,8 +928,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   reactionBadgeActive: {
-    backgroundColor: 'rgba(42, 171, 238, 0.25)',
-    borderColor: '#2AABEE',
+    backgroundColor: 'rgba(0, 168, 255, 0.22)',
+    borderColor: '#00A8FF',
   },
   reactionEmoji: {
     fontSize: 13,
@@ -909,45 +941,45 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   reactionCountActive: {
-    color: '#2AABEE',
+    color: '#00A8FF',
   },
   toastContainer: {
     position: 'absolute',
     top: 70,
     alignSelf: 'center',
-    backgroundColor: 'rgba(23, 33, 43, 0.95)',
+    backgroundColor: 'rgba(20, 28, 43, 0.95)',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 9,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#2AABEE',
+    borderColor: '#00A8FF',
     zIndex: 999,
   },
   toastText: {
     color: '#FFF',
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   replyPreviewBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1E2B38',
+    backgroundColor: '#141C2B',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderTopWidth: 1,
-    borderTopColor: '#101721',
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
   },
   replyPreviewLine: {
     width: 3,
     height: 32,
-    backgroundColor: '#2AABEE',
+    backgroundColor: '#00A8FF',
     borderRadius: 2,
   },
   replyPreviewContent: {
     flex: 1,
   },
   replyPreviewSender: {
-    color: '#2AABEE',
+    color: '#00A8FF',
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -961,11 +993,11 @@ const styles = StyleSheet.create({
   inputBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#17212B',
+    backgroundColor: '#0E1420',
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderTopWidth: 1,
-    borderTopColor: '#101721',
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
   },
   attachmentBtn: {
     padding: 6,
@@ -985,24 +1017,34 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#2AABEE',
+    backgroundColor: '#00A8FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 6,
+    shadowColor: '#00A8FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.45,
+    shadowRadius: 4,
+    elevation: 3,
   },
   micBtn: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#2AABEE',
+    backgroundColor: '#00A8FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 6,
+    shadowColor: '#00A8FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.45,
+    shadowRadius: 4,
+    elevation: 3,
   },
   inputEmojiTray: {
-    backgroundColor: '#17212B',
+    backgroundColor: '#141C2B',
     borderTopWidth: 1,
-    borderTopColor: '#101721',
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
     paddingVertical: 10,
     paddingHorizontal: 8,
   },
@@ -1015,7 +1057,7 @@ const styles = StyleSheet.create({
   },
   menuOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.65)',
+    backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -1026,7 +1068,7 @@ const styles = StyleSheet.create({
   },
   menuReactionPill: {
     flexDirection: 'row',
-    backgroundColor: '#1E2B38',
+    backgroundColor: '#172133',
     borderRadius: 28,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -1034,11 +1076,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
     elevation: 8,
     borderWidth: 1,
-    borderColor: '#293A4C',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   quickReactionBtn: {
     paddingHorizontal: 6,
@@ -1046,28 +1088,28 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   quickReactionBtnActive: {
-    backgroundColor: 'rgba(42, 171, 238, 0.3)',
+    backgroundColor: 'rgba(0, 168, 255, 0.25)',
   },
   allEmojisBtn: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#17212B',
+    backgroundColor: '#141C2B',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 6,
   },
   menuActionsCard: {
-    backgroundColor: '#17212B',
-    borderRadius: 14,
+    backgroundColor: '#172133',
+    borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
+    elevation: 10,
     borderWidth: 1,
-    borderColor: '#243242',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   menuActionRow: {
     flexDirection: 'row',
@@ -1083,23 +1125,23 @@ const styles = StyleSheet.create({
   },
   menuDivider: {
     height: 0.6,
-    backgroundColor: '#243242',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     marginLeft: 52,
   },
   fullEmojiOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.65)',
     justifyContent: 'flex-end',
   },
   fullEmojiSheet: {
-    backgroundColor: '#17212B',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: '#141C2B',
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
     maxHeight: '65%',
     paddingTop: 16,
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: '#243242',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   fullEmojiHeader: {
     flexDirection: 'row',
@@ -1107,7 +1149,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#243242',
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
   },
   fullEmojiTitle: {
     color: '#FFF',
@@ -1124,7 +1166,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   categoryHeaderTitle: {
-    color: '#7F91A4',
+    color: '#8B9BB0',
     fontSize: 12,
     fontWeight: 'bold',
     textTransform: 'uppercase',
