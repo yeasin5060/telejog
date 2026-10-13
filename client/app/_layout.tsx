@@ -20,6 +20,7 @@ export default function RootLayout() {
       <Stack.Screen name="(auth)"/>
       <Stack.Screen name="(tabs)"/>
       <Stack.Screen name="chat/[id]" options={{animation : "slide_from_right"}}/>
+      <Stack.Screen name="devices" options={{animation : "slide_from_right"}}/>
     </Stack>
     <StatusBar style="dark"/>
   </GestureHandlerRootView>
