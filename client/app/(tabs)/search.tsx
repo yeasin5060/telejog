@@ -7,10 +7,10 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { dummyConversationData, dummyUsers } from '@/assets/assets';
@@ -256,7 +256,7 @@ export default function SearchScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       {/* 1. TOP SEARCH BAR HEADER */}
       <View style={styles.header}>
         <View

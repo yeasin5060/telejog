@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,13 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   Modal,
   ScrollView,
+  Keyboard,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
@@ -25,20 +26,29 @@ const QUICK_EMOJIS = ['👍', '❤️', '🔥', '😂', '🎉', '👏', '🥰', 
 // Full categorized emojis
 const EMOJI_CATEGORIES = [
   {
-    name: 'Popular Reactions',
-    emojis: ['👍', '👎', '❤️', '🔥', '🥰', '👏', '😁', '🤔', '🤯', '😱', '🤬', '😢', '🎉', '🤩', '🤮', '💩', '🙏', '👌', '💯', '⚡', '🤣', '😍', '🚀', '🏆', '💔', '😴', '😭', '🤝'],
-  },
-  {
     name: 'Smileys & Emotion',
+    icon: '😀',
     emojis: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😋', '😛', '😜', '🤪', '😝', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😏', '🙄', '😬', '😌', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🥵', '🥶', '🥴', '😵', '🤯', '🥳', '😎', '🤓', '🧐', '🥺', '😱', '😢', '😭', '😤', '😡', '🤬'],
   },
   {
+    name: 'Popular Reactions',
+    icon: '🔥',
+    emojis: ['👍', '👎', '❤️', '🔥', '🥰', '👏', '😁', '🤔', '🤯', '😱', '🤬', '😢', '🎉', '🤩', '🤮', '💩', '🙏', '👌', '💯', '⚡', '🤣', '😍', '🚀', '🏆', '💔', '😴', '😭', '🤝', '✨', '☕', '💪', '👀'],
+  },
+  {
     name: 'Hands & Gestures',
+    icon: '👍',
     emojis: ['👍', '👎', '👊', '✊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '✍️', '💅', '🤳', '💪', '👈', '👉', '👆', '👇', '☝️', '✌️', '🤞', '🫰', '🤟', '🤘', '🤙', '👌', '🤌', '🤏', '🖐️', '✋', '👋'],
   },
   {
     name: 'Hearts & Symbols',
+    icon: '❤️',
     emojis: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '🔥', '✨', '⭐', '🌟', '💫', '💥', '💯', '⚡', '🎉', '🎊', '🏆', '👑', '💎', '🎯', '🎈'],
+  },
+  {
+    name: 'Objects & Party',
+    icon: '🎉',
+    emojis: ['🎉', '🚀', '🏆', '💎', '🎯', '🎈', '🎁', '🎮', '📱', '💻', '💡', '💰', '☕', '🍕', '🍔', '🍺', '🚗', '✈️', '🌈', '☀️', '🌙', '⭐', '⚡', '🎵', '🎧', '📸', '🔥', '🪄', '🔔', '⚽'],
   },
 ];
 
@@ -76,6 +86,58 @@ export default function ChatScreen() {
 
   const flatListRef = useRef<FlatList>(null);
   const inputRef = useRef<TextInput>(null);
+
+  const insets = useSafeAreaInsets();
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [selectedEmojiCategory, setSelectedEmojiCategory] = useState(0);
+
+  // Monitor keyboard visibility to coordinate keyboard and emoji tray smoothly
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        setIsKeyboardVisible(true);
+        setShowInputEmojiTray(false);
+      }
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const handleToggleEmojiTray = () => {
+    if (showInputEmojiTray) {
+      setShowInputEmojiTray(false);
+      inputRef.current?.focus();
+    } else {
+      Keyboard.dismiss();
+      setShowInputEmojiTray(true);
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 150);
+    }
+  };
+
+  const handleSelectEmoji = (emoji: string) => {
+    setInputText((prev) => prev + emoji);
+  };
+
+  const handleBackspace = () => {
+    setInputText((prev) => {
+      if (!prev) return '';
+      const chars = Array.from(prev);
+      chars.pop();
+      return chars.join('');
+    });
+  };
 
   const showToast = (text: string) => {
     setToastMessage(text);
@@ -253,11 +315,11 @@ export default function ChatScreen() {
               <View style={styles.replyBarAccent} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.replySender}>{item.replyTo.senderName}</Text>
-                <Text style={styles.replyText} numberOfLines={1}>
+                <Text style={styles.replyText} numberOfLines={2}>
                   {item.replyTo.text}
                 </Text>
               </View>
-              <Ionicons name="arrow-undo" size={12} color="#00A8FF" style={{ marginLeft: 4 }} />
+              <Ionicons name="arrow-undo" size={13} color="#00A8FF" style={{ marginLeft: 6 }} />
             </TouchableOpacity>
           )}
 
@@ -345,10 +407,11 @@ export default function ChatScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         {/* Modern Telegram Chat Header */}
         <View style={styles.header}>
@@ -411,98 +474,181 @@ export default function ChatScreen() {
           </View>
         )}
 
-        {/* SINGLE MESSAGE REPLY PREVIEW BANNER */}
-        {replyingTo && (
-          <View style={styles.replyPreviewBar}>
-            <View style={styles.replyPreviewLine} />
-            <Ionicons name="arrow-undo" size={18} color="#00A8FF" style={{ marginHorizontal: 8 }} />
-            <View style={styles.replyPreviewContent}>
-              <Text style={styles.replyPreviewSender} numberOfLines={1}>
-                Reply to {replyingTo.sender === 'current_user' ? 'You' : participantName}
-              </Text>
-              <Text style={styles.replyPreviewText} numberOfLines={1}>
-                {replyingTo.text ||
-                  (replyingTo.mediaType === 'image'
-                    ? '📷 Photo'
-                    : replyingTo.mediaType === 'voice'
-                    ? '🎤 Voice note'
-                    : 'Message')}
-              </Text>
+        {/* TELEGRAM FLOATING BOTTOM INPUT DOCK */}
+        <View
+          style={[
+            styles.floatingContainer,
+            {
+              paddingBottom: isKeyboardVisible
+                ? 8
+                : showInputEmojiTray
+                ? 0
+                : Math.max(insets.bottom, 12),
+            },
+          ]}
+        >
+          {/* FLOATING ACTION ROW */}
+          <View style={styles.floatingActionRow}>
+            {/* FLOATING PILL DOCK (WITH INTEGRATED REPLY PREVIEW) */}
+            <View style={styles.floatingInputDock}>
+              {/* SINGLE MESSAGE REPLY PREVIEW BANNER */}
+              {replyingTo && (
+                <View style={styles.floatingReplyPreviewBar}>
+                  <View style={styles.floatingReplyAccentLine} />
+                  <Ionicons name="arrow-undo" size={17} color="#00A8FF" style={{ marginHorizontal: 8 }} />
+                  <View style={styles.floatingReplyContent}>
+                    <Text style={styles.floatingReplySender} numberOfLines={1}>
+                      Replying to {replyingTo.sender === 'current_user' ? 'You' : participantName}
+                    </Text>
+                    <Text style={styles.floatingReplyText} numberOfLines={2}>
+                      {replyingTo.text ||
+                        (replyingTo.mediaType === 'image'
+                          ? '📷 Photo'
+                          : replyingTo.mediaType === 'voice'
+                          ? '🎤 Voice note'
+                          : 'Message')}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.floatingCancelReplyBtn}
+                    onPress={() => setReplyingTo(null)}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <Ionicons name="close-circle" size={20} color="#8B9BB0" />
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* INPUT CONTROLS ROW */}
+              <View style={styles.floatingInputControlsRow}>
+                <TouchableOpacity style={styles.floatingAttachmentBtn} activeOpacity={0.7}>
+                  <Ionicons name="attach-outline" size={24} color="#8B9BB0" />
+                </TouchableOpacity>
+
+                <TextInput
+                  ref={inputRef}
+                  placeholder={replyingTo ? 'Write a reply...' : 'Message...'}
+                  placeholderTextColor="#6D7E94"
+                  style={[
+                    styles.floatingTextInput,
+                    Platform.OS === 'web' && ({
+                      outlineStyle: 'none',
+                      outlineWidth: 0,
+                      outlineColor: 'transparent',
+                      boxShadow: 'none',
+                    } as any),
+                  ]}
+                  value={inputText}
+                  onChangeText={setInputText}
+                  onFocus={() => {
+                    setShowInputEmojiTray(false);
+                    setTimeout(() => {
+                      flatListRef.current?.scrollToEnd({ animated: true });
+                    }, 150);
+                  }}
+                  multiline
+                />
+
+                <TouchableOpacity
+                  style={styles.floatingEmojiBtn}
+                  onPress={handleToggleEmojiTray}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons
+                    name={showInputEmojiTray ? 'keypad-outline' : 'happy-outline'}
+                    size={24}
+                    color={showInputEmojiTray ? '#00A8FF' : '#8B9BB0'}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
-            <TouchableOpacity
-              style={styles.cancelReplyBtn}
-              onPress={() => setReplyingTo(null)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Ionicons name="close" size={20} color="#8B9BB0" />
-            </TouchableOpacity>
+
+            {/* FLOATING CIRCULAR SEND / MIC BUTTON */}
+            {inputText.trim().length > 0 ? (
+              <TouchableOpacity
+                style={styles.floatingSendBtn}
+                onPress={handleSendMessage}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="send" size={19} color="#FFF" style={{ marginLeft: 2 }} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.floatingMicBtn}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="mic-outline" size={22} color="#FFF" />
+              </TouchableOpacity>
+            )}
           </View>
-        )}
 
-        {/* Telegram Input Bar */}
-        <View style={styles.inputBar}>
-          <TouchableOpacity style={styles.attachmentBtn}>
-            <Ionicons name="attach-outline" size={24} color="#8B9BB0" />
-          </TouchableOpacity>
+          {/* IN-APP TELEGRAM EMOJI TRAY */}
+          {showInputEmojiTray && (
+            <View
+              style={[
+                styles.inputEmojiTray,
+                { paddingBottom: Math.max(insets.bottom, 12) },
+              ]}
+            >
+              {/* Category tabs & backspace header */}
+              <View style={styles.emojiTrayHeader}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.categoryScrollContent}
+                >
+                  {EMOJI_CATEGORIES.map((cat, idx) => (
+                    <TouchableOpacity
+                      key={cat.name}
+                      style={[
+                        styles.emojiCategoryTab,
+                        selectedEmojiCategory === idx && styles.emojiCategoryTabActive,
+                      ]}
+                      onPress={() => setSelectedEmojiCategory(idx)}
+                    >
+                      <Text style={styles.emojiCategoryIcon}>{cat.icon}</Text>
+                      <Text
+                        style={[
+                          styles.emojiCategoryLabel,
+                          selectedEmojiCategory === idx && styles.emojiCategoryLabelActive,
+                        ]}
+                      >
+                        {cat.name.split(' ')[0]}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
 
-          <TextInput
-            ref={inputRef}
-            placeholder={replyingTo ? 'Write a reply...' : 'Message...'}
-            placeholderTextColor="#5E6F85"
-            style={[
-              styles.textInput,
-              Platform.OS === 'web' && ({
-                outlineStyle: 'none',
-                outlineWidth: 0,
-                outlineColor: 'transparent',
-                boxShadow: 'none',
-              } as any),
-            ]}
-            value={inputText}
-            onChangeText={setInputText}
-            multiline
-          />
+                <TouchableOpacity
+                  style={styles.emojiBackspaceBtn}
+                  onPress={handleBackspace}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="backspace-outline" size={22} color="#8B9BB0" />
+                </TouchableOpacity>
+              </View>
 
-          <TouchableOpacity
-            style={styles.emojiBtn}
-            onPress={() => setShowInputEmojiTray((prev) => !prev)}
-          >
-            <Ionicons
-              name={showInputEmojiTray ? 'keypad-outline' : 'happy-outline'}
-              size={24}
-              color={showInputEmojiTray ? '#00A8FF' : '#8B9BB0'}
-            />
-          </TouchableOpacity>
-
-          {inputText.trim().length > 0 ? (
-            <TouchableOpacity style={styles.sendBtn} onPress={handleSendMessage}>
-              <Ionicons name="send" size={17} color="#FFF" />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.micBtn}>
-              <Ionicons name="mic-outline" size={21} color="#FFF" />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* IN-APP EMOJI TRAY */}
-        {showInputEmojiTray && (
-          <View style={styles.inputEmojiTray}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.emojiTrayScroll}>
-              {['😀', '😂', '🔥', '❤️', '👍', '🎉', '🥰', '👏', '🙏', '😎', '🤩', '🚀', '💯', '✨', '☕', '🥳', '🙌', '😍', '🤔', '💪', '⚡', '👀', '🤝', '👌'].map(
-                (emoji) => (
+              {/* Multi-row scrollable Emoji Grid */}
+              <ScrollView
+                style={styles.emojiGridScroll}
+                contentContainerStyle={styles.emojiGridContent}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="always"
+              >
+                {EMOJI_CATEGORIES[selectedEmojiCategory].emojis.map((emoji) => (
                   <TouchableOpacity
                     key={emoji}
                     style={styles.trayEmojiItem}
-                    onPress={() => setInputText((prev) => prev + emoji)}
+                    activeOpacity={0.6}
+                    onPress={() => handleSelectEmoji(emoji)}
                   >
-                    <Text style={{ fontSize: 24 }}>{emoji}</Text>
+                    <Text style={styles.trayEmojiChar}>{emoji}</Text>
                   </TouchableOpacity>
-                )
-              )}
-            </ScrollView>
-          </View>
-        )}
+                ))}
+              </ScrollView>
+            </View>
+          )}
+        </View>
 
         {/* MESSAGE ACTIONS & QUICK REACTION MODAL */}
         {selectedMsgForMenu && (
@@ -845,12 +991,12 @@ const styles = StyleSheet.create({
   replyBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.25)',
-    paddingVertical: 5,
-    paddingHorizontal: 8,
-    borderRadius: 6,
+    backgroundColor: 'rgba(0, 168, 255, 0.12)',
+    paddingVertical: 6,
+    paddingHorizontal: 9,
+    borderRadius: 8,
     marginBottom: 6,
-    borderLeftWidth: 3,
+    borderLeftWidth: 3.5,
     borderLeftColor: '#00A8FF',
   },
   replyBarAccent: {
@@ -858,12 +1004,14 @@ const styles = StyleSheet.create({
   },
   replySender: {
     color: '#00A8FF',
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: 12.5,
+    fontWeight: '700',
+    marginBottom: 2,
   },
   replyText: {
-    color: '#D2D8DF',
-    fontSize: 12,
+    color: '#E0E7F0',
+    fontSize: 12.5,
+    lineHeight: 16,
   },
   voiceContainer: {
     flexDirection: 'row',
@@ -969,91 +1117,179 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.06)',
   },
-  replyPreviewLine: {
-    width: 3,
-    height: 32,
+  floatingContainer: {
+    backgroundColor: 'transparent',
+  },
+  floatingActionRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingHorizontal: 10,
+    paddingTop: 6,
+    paddingBottom: 4,
+  },
+  floatingInputDock: {
+    flex: 1,
+    backgroundColor: '#162030',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 8,
+    overflow: 'hidden',
+  },
+  floatingReplyPreviewBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 168, 255, 0.08)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.07)',
+    paddingVertical: 7,
+    paddingHorizontal: 8,
+  },
+  floatingReplyAccentLine: {
+    width: 3.5,
+    height: 30,
     backgroundColor: '#00A8FF',
     borderRadius: 2,
   },
-  replyPreviewContent: {
+  floatingReplyContent: {
     flex: 1,
+    marginLeft: 6,
   },
-  replyPreviewSender: {
+  floatingReplySender: {
     color: '#00A8FF',
+    fontSize: 12.5,
+    fontWeight: '700',
+  },
+  floatingReplyText: {
+    color: '#CFD8E3',
     fontSize: 12,
-    fontWeight: 'bold',
+    marginTop: 1,
   },
-  replyPreviewText: {
-    color: '#BAC2CB',
-    fontSize: 12,
+  floatingCancelReplyBtn: {
+    padding: 4,
+    marginLeft: 6,
   },
-  cancelReplyBtn: {
-    padding: 6,
-  },
-  inputBar: {
+  floatingInputControlsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0E1420',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 6,
+    minHeight: 48,
   },
-  attachmentBtn: {
-    padding: 6,
+  floatingAttachmentBtn: {
+    padding: 8,
   },
-  textInput: {
+  floatingTextInput: {
     flex: 1,
     color: '#FFF',
     fontSize: 15,
-    maxHeight: 100,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    maxHeight: 110,
+    paddingHorizontal: 6,
+    paddingVertical: 8,
   },
-  emojiBtn: {
-    padding: 6,
+  floatingEmojiBtn: {
+    padding: 8,
   },
-  sendBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+  floatingSendBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#00A8FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 6,
+    marginLeft: 8,
     shadowColor: '#00A8FF',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.45,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 6,
+    elevation: 6,
   },
-  micBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+  floatingMicBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#00A8FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 6,
+    marginLeft: 8,
     shadowColor: '#00A8FF',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.45,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 6,
+    elevation: 6,
   },
   inputEmojiTray: {
-    backgroundColor: '#141C2B',
+    height: 260,
+    backgroundColor: '#121926',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.06)',
-    paddingVertical: 10,
-    paddingHorizontal: 8,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
   },
-  emojiTrayScroll: {
+  emojiTrayHeader: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  categoryScrollContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  emojiCategoryTab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 16,
+    marginRight: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  emojiCategoryTabActive: {
+    backgroundColor: 'rgba(0, 168, 255, 0.22)',
+    borderWidth: 1,
+    borderColor: '#00A8FF',
+  },
+  emojiCategoryIcon: {
+    fontSize: 16,
+    marginRight: 4,
+  },
+  emojiCategoryLabel: {
+    color: '#8B9BB0',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  emojiCategoryLabelActive: {
+    color: '#00A8FF',
+  },
+  emojiBackspaceBtn: {
+    padding: 8,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    marginLeft: 6,
+  },
+  emojiGridScroll: {
+    flex: 1,
+  },
+  emojiGridContent: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 6,
+    paddingVertical: 8,
+    justifyContent: 'flex-start',
   },
   trayEmojiItem: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    width: '12.5%',
+    aspectRatio: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  trayEmojiChar: {
+    fontSize: 27,
   },
   menuOverlay: {
     flex: 1,

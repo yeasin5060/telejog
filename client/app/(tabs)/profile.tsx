@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   ScrollView,
   Switch,
-  SafeAreaView,
   Modal,
   TextInput,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
@@ -103,7 +103,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       {/* Top Header */}
       <View style={styles.topBar}>
         <Text style={styles.topBarTitle}>Settings</Text>
