@@ -1,32 +1,43 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Platform } from 'react-native';
+import { Platform, View, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+
+  // Dynamic bottom padding & height that guarantees crystal clear visibility on ALL Android & iOS mobile devices
+  const bottomPadding = Math.max(insets.bottom, Platform.OS === 'android' ? 12 : 16);
+  const tabHeight = 60 + bottomPadding;
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: '#00A8FF',
-        tabBarInactiveTintColor: '#5E6F85',
+        tabBarInactiveTintColor: '#8E9EB2',
         tabBarStyle: {
-          backgroundColor: '#0E1420',
-          borderTopColor: 'rgba(255, 255, 255, 0.06)',
-          borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 70 : 62,
-          paddingBottom: Platform.OS === 'ios' ? 14 : 8,
+          backgroundColor: '#121A28',
+          borderTopColor: 'rgba(0, 168, 255, 0.22)',
+          borderTopWidth: 1.5,
+          height: tabHeight,
+          paddingBottom: bottomPadding,
           paddingTop: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 6,
-          elevation: 8,
+          shadowOpacity: 0.45,
+          shadowRadius: 10,
+          elevation: 16,
         },
         tabBarLabelStyle: {
-          fontSize: 11.5,
-          fontWeight: '600',
-          marginTop: -2,
+          fontSize: 12,
+          fontWeight: '700',
+          marginTop: 2,
+        },
+        tabBarItemStyle: {
+          paddingVertical: 3,
         },
       }}
     >
@@ -35,11 +46,13 @@ export default function TabLayout() {
         options={{
           title: 'Chats',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
-              size={23}
-              color={color}
-            />
+            <View style={[styles.iconWrapper, focused && styles.iconWrapperActive]}>
+              <Ionicons
+                name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
+                size={23}
+                color={color}
+              />
+            </View>
           ),
         }}
       />
@@ -48,11 +61,13 @@ export default function TabLayout() {
         options={{
           title: 'Search',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'search' : 'search-outline'}
-              size={23}
-              color={color}
-            />
+            <View style={[styles.iconWrapper, focused && styles.iconWrapperActive]}>
+              <Ionicons
+                name={focused ? 'search' : 'search-outline'}
+                size={23}
+                color={color}
+              />
+            </View>
           ),
         }}
       />
@@ -61,14 +76,27 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'person-circle' : 'person-circle-outline'}
-              size={24}
-              color={color}
-            />
+            <View style={[styles.iconWrapper, focused && styles.iconWrapperActive]}>
+              <Ionicons
+                name={focused ? 'person-circle' : 'person-circle-outline'}
+                size={24}
+                color={color}
+              />
+            </View>
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  iconWrapper: {
+    paddingHorizontal: 14,
+    paddingVertical: 3,
+    borderRadius: 14,
+  },
+  iconWrapperActive: {
+    backgroundColor: 'rgba(0, 168, 255, 0.16)',
+  },
+});

@@ -7,9 +7,9 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  SafeAreaView,
   TextInput,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { UserStory } from '@/types';
 import { Colors } from '@/constants/Colors';
@@ -53,7 +53,7 @@ export default function StoryViewerModal({ visible, userStory, onClose }: Props)
 
   return (
     <Modal visible={visible} animationType="fade" transparent statusBarTranslucent>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         {/* Top Progress Bar */}
         <View style={styles.progressContainer}>
           {userStory.stories.map((_, idx) => (
