@@ -51,7 +51,7 @@ export default function CategoryFolderTabs({
               <Ionicons
                 name={cat.icon}
                 size={14}
-                color={isActive ? '#00A8FF' : '#8B9BB0'}
+                color={isActive ? Colors.primary : Colors.textMuted}
                 style={{ marginRight: 6 }}
               />
 
@@ -66,7 +66,9 @@ export default function CategoryFolderTabs({
                     isActive ? styles.activeBadge : styles.inactiveBadge,
                   ]}
                 >
-                  <Text style={styles.badgeText}>{unread}</Text>
+                  <Text style={[styles.badgeText, isActive && styles.activeBadgeText]}>
+                    {unread}
+                  </Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -80,9 +82,9 @@ export default function CategoryFolderTabs({
 const styles = StyleSheet.create({
   container: {
     height: 48,
-    backgroundColor: '#0E1420',
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: Colors.divider,
     justifyContent: 'center',
   },
   scrollContent: {
@@ -101,22 +103,22 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   activeTabCapsule: {
-    backgroundColor: 'rgba(0, 168, 255, 0.12)',
-    borderColor: 'rgba(0, 168, 255, 0.35)',
-    shadowColor: '#00A8FF',
+    backgroundColor: 'rgba(0, 245, 212, 0.12)',
+    borderColor: 'rgba(0, 245, 212, 0.4)',
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 3,
   },
   tabText: {
     fontSize: 13,
-    fontWeight: '500',
-    color: '#8B9BB0',
+    fontWeight: '600',
+    color: Colors.textSecondary,
   },
   activeTabText: {
-    color: '#00A8FF',
-    fontWeight: 'bold',
+    color: Colors.primary,
+    fontWeight: '700',
   },
   badge: {
     borderRadius: 10,
@@ -125,14 +127,18 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   activeBadge: {
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.primary,
   },
   inactiveBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(139, 92, 246, 0.25)',
   },
   badgeText: {
     color: '#FFF',
     fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: '800',
+  },
+  activeBadgeText: {
+    color: '#08090E',
+    fontWeight: '800',
   },
 });

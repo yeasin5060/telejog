@@ -100,7 +100,7 @@ export default function MessageScreen() {
                 <Ionicons
                   name="checkmark-circle"
                   size={15}
-                  color="#00A8FF"
+                  color={Colors.primary}
                   style={{ marginLeft: 4 }}
                 />
               )}
@@ -121,7 +121,7 @@ export default function MessageScreen() {
                 <Ionicons
                   name={item.lastMessage.read ? 'checkmark-done' : 'checkmark'}
                   size={15}
-                  color="#00A8FF"
+                  color={Colors.primary}
                   style={{ marginRight: 4 }}
                 />
               )}
@@ -135,13 +135,13 @@ export default function MessageScreen() {
                 <Ionicons
                   name="notifications-off-outline"
                   size={14}
-                  color="#5E6F85"
+                  color={Colors.textMuted}
                   style={{ marginRight: 6 }}
                 />
               )}
               {item.isPinned && (
                 <View style={styles.pinnedIconBox}>
-                  <Ionicons name="pin" size={13} color="#00A8FF" />
+                  <Ionicons name="pin" size={13} color={Colors.primaryViolet} />
                 </View>
               )}
               {(item.unreadCount || 0) > 0 && (
@@ -169,10 +169,10 @@ export default function MessageScreen() {
       <View style={styles.topHeader}>
         {isSearchOpen ? (
           <View style={styles.searchBarHeader}>
-            <Ionicons name="search" size={20} color="#00A8FF" />
+            <Ionicons name="search" size={20} color={Colors.primary} />
             <TextInput
               placeholder="Search chats, people, channels..."
-              placeholderTextColor="#5E6F85"
+              placeholderTextColor={Colors.textMuted}
               style={[
                 styles.headerSearchInput,
                 Platform.OS === 'web' && ({
@@ -193,7 +193,7 @@ export default function MessageScreen() {
               }}
               style={styles.closeSearchBtn}
             >
-              <Ionicons name="close" size={20} color="#8B9BB0" />
+              <Ionicons name="close" size={20} color={Colors.textMuted} />
             </TouchableOpacity>
           </View>
         ) : (
@@ -212,7 +212,7 @@ export default function MessageScreen() {
 
             <View style={styles.headerTitleContainer}>
               <View style={styles.brandBadge}>
-                <Ionicons name="paper-plane" size={16} color="#00A8FF" style={{ marginRight: 6 }} />
+                <Ionicons name="paper-plane" size={16} color={Colors.primary} style={{ marginRight: 6 }} />
                 <Text style={styles.headerTitle}>Telejog</Text>
               </View>
             </View>
@@ -284,17 +284,17 @@ export default function MessageScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0B0F17',
+    backgroundColor: Colors.background,
   },
   topHeader: {
     height: 58,
-    backgroundColor: '#0B0F17',
+    backgroundColor: Colors.surface,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: Colors.divider,
   },
   drawerBtn: {
     padding: 6,
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   menuBarMedium: {
     width: 16,
     height: 2.2,
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.primary,
     borderRadius: 2,
   },
   menuBarShort: {
@@ -353,12 +353,12 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#141C2B',
+    backgroundColor: Colors.surfaceCard,
     borderRadius: 22,
     paddingHorizontal: 14,
     height: 42,
     borderWidth: 1,
-    borderColor: 'rgba(0, 168, 255, 0.3)',
+    borderColor: 'rgba(0, 245, 212, 0.35)',
   },
   headerSearchInput: {
     flex: 1,
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    backgroundColor: '#0B0F17',
+    backgroundColor: Colors.background,
   },
   listContainer: {
     paddingBottom: 80,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#0B0F17',
+    backgroundColor: Colors.background,
   },
   avatarContainer: {
     position: 'relative',
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#141C2B',
+    backgroundColor: Colors.surface,
   },
   onlineDot: {
     position: 'absolute',
@@ -401,20 +401,20 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#00E676',
+    backgroundColor: Colors.online,
     borderWidth: 2.5,
-    borderColor: '#0B0F17',
-    shadowColor: '#00E676',
+    borderColor: Colors.background,
+    shadowColor: Colors.online,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.6,
-    shadowRadius: 3,
-    elevation: 3,
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 4,
   },
   botBadge: {
     position: 'absolute',
     top: -2,
     right: -2,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#EC4899',
     borderRadius: 6,
     paddingHorizontal: 4,
     paddingVertical: 1,
@@ -428,14 +428,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -2,
     right: -2,
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.primaryViolet,
     borderRadius: 8,
     width: 16,
     height: 16,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#0B0F17',
+    borderColor: Colors.background,
   },
   chatDetails: {
     flex: 1,
@@ -448,13 +448,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   chatTitle: {
-    color: '#FFFFFF',
+    color: Colors.textPrimary,
     fontSize: 15.5,
     fontWeight: '700',
     letterSpacing: 0.2,
   },
   timeText: {
-    color: '#5E6F85',
+    color: Colors.textMuted,
     fontSize: 12,
     fontWeight: '500',
   },
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   lastMessageText: {
-    color: '#8B9BB0',
+    color: Colors.textSecondary,
     fontSize: 13.5,
     lineHeight: 18,
   },
@@ -482,31 +482,31 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   unreadBadge: {
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.primary,
     borderRadius: 12,
     paddingHorizontal: 7,
     paddingVertical: 2,
     minWidth: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#00A8FF',
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.5,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 4,
   },
   unreadBadgeMuted: {
-    backgroundColor: '#2E3D52',
+    backgroundColor: '#252B44',
     shadowOpacity: 0,
   },
   unreadText: {
-    color: '#FFF',
+    color: Colors.unreadBadgeText,
     fontSize: 11,
-    fontWeight: 'bold',
+    fontWeight: '900',
   },
   separator: {
     height: 0.8,
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
     marginLeft: 82,
   },
   fabBtn: {
@@ -516,13 +516,15 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.primaryViolet,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#00A8FF',
+    shadowColor: Colors.primaryViolet,
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.45,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
 });

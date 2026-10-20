@@ -270,14 +270,14 @@ export default function SearchScreen() {
             <Ionicons
               name={voiceSearchActive ? 'mic' : 'search'}
               size={18}
-              color={voiceSearchActive ? '#FF6B6B' : isFocused ? '#00A8FF' : '#5E6F85'}
+              color={voiceSearchActive ? '#FF6B6B' : isFocused ? Colors.primary : Colors.textMuted}
             />
           </View>
 
           {/* Fully outline-free Text Input on Web and Native */}
           <TextInput
             placeholder={voiceSearchActive ? 'Listening...' : 'Search messages, channels, bots...'}
-            placeholderTextColor="#5E6F85"
+            placeholderTextColor={Colors.textMuted}
             style={[
               styles.searchInput,
               Platform.OS === 'web' && ({
@@ -303,7 +303,7 @@ export default function SearchScreen() {
                 style={styles.actionIconBtn}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Ionicons name="close-circle" size={19} color="#8B9BB0" />
+                <Ionicons name="close-circle" size={19} color={Colors.textMuted} />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
@@ -314,7 +314,7 @@ export default function SearchScreen() {
                 <Ionicons
                   name={voiceSearchActive ? 'mic' : 'mic-outline'}
                   size={19}
-                  color={voiceSearchActive ? '#00A8FF' : '#5E6F85'}
+                  color={voiceSearchActive ? Colors.primary : Colors.textMuted}
                 />
               </TouchableOpacity>
             )}
@@ -780,7 +780,7 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0B0F17',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -788,18 +788,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 10,
-    backgroundColor: '#0B0F17',
+    backgroundColor: Colors.background,
   },
   searchBox: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#131B2A',
+    backgroundColor: Colors.surfaceCard,
     borderRadius: 22,
     paddingHorizontal: 10,
     height: 48,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(139, 92, 246, 0.2)',
     // Eliminate web focus outlines on container
     ...(Platform.OS === 'web'
       ? ({
@@ -809,11 +809,11 @@ const styles = StyleSheet.create({
       : {}),
   },
   searchBoxFocused: {
-    borderColor: 'rgba(0, 168, 255, 0.5)',
-    backgroundColor: '#162235',
-    shadowColor: '#00A8FF',
+    borderColor: 'rgba(0, 245, 212, 0.5)',
+    backgroundColor: Colors.surfaceElevated,
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.35,
     shadowRadius: 8,
     elevation: 4,
   },
@@ -826,7 +826,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   searchIconBadgeFocused: {
-    backgroundColor: 'rgba(0, 168, 255, 0.12)',
+    backgroundColor: 'rgba(0, 245, 212, 0.16)',
   },
   searchInput: {
     flex: 1,
@@ -861,15 +861,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   cancelHeaderText: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   filterBar: {
     paddingVertical: 8,
-    backgroundColor: '#0B0F17',
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: Colors.divider,
   },
   filterScroll: {
     paddingHorizontal: 14,
@@ -886,16 +886,16 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   activeFilterChip: {
-    backgroundColor: 'rgba(0, 168, 255, 0.15)',
-    borderColor: 'rgba(0, 168, 255, 0.45)',
+    backgroundColor: 'rgba(0, 245, 212, 0.14)',
+    borderColor: 'rgba(0, 245, 212, 0.45)',
   },
   filterText: {
-    color: '#8B9BB0',
+    color: Colors.textSecondary,
     fontSize: 13,
     fontWeight: '600',
   },
   activeFilterText: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontWeight: '700',
   },
   filterCountBadge: {
@@ -906,19 +906,19 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
   },
   activeFilterCountBadge: {
-    backgroundColor: 'rgba(0, 168, 255, 0.3)',
+    backgroundColor: 'rgba(0, 245, 212, 0.25)',
   },
   filterCountText: {
-    color: '#8B9BB0',
+    color: Colors.textMuted,
     fontSize: 10.5,
     fontWeight: '700',
   },
   activeFilterCountText: {
-    color: '#FFF',
+    color: '#08090E',
   },
   body: {
     flex: 1,
-    backgroundColor: '#0B0F17',
+    backgroundColor: Colors.background,
   },
   exploreScroll: {
     paddingVertical: 14,
