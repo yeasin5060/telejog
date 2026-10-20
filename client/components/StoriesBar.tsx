@@ -30,13 +30,13 @@ export default function StoriesBar({ stories }: Props) {
               style={styles.avatar}
             />
             <View style={styles.addBadge}>
-              <Ionicons name="add" size={15} color="#FFF" />
+              <Ionicons name="add" size={15} color={Colors.unreadBadgeText} />
             </View>
           </View>
           <Text style={styles.myStoryText} numberOfLines={1}>Your story</Text>
         </TouchableOpacity>
 
-        {/* User Stories with Neon Gradient Rings */}
+        {/* User Stories with Signature Glow Rings */}
         {stories.map((item, idx) => (
           <TouchableOpacity
             key={item.user._id || idx}
@@ -78,9 +78,9 @@ export default function StoriesBar({ stories }: Props) {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 12,
-    backgroundColor: '#0E1420',
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: Colors.divider,
   },
   scrollContent: {
     paddingHorizontal: 14,
@@ -96,24 +96,24 @@ const styles = StyleSheet.create({
     padding: 3,
     borderRadius: 34,
     borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   addBadge: {
     position: 'absolute',
     bottom: -2,
     right: -2,
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.primary,
     width: 22,
     height: 22,
     borderRadius: 11,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2.5,
-    borderColor: '#0E1420',
-    shadowColor: '#00A8FF',
+    borderColor: Colors.surface,
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
+    shadowOpacity: 0.6,
+    shadowRadius: 5,
     elevation: 4,
   },
   storyRingWrapper: {
@@ -122,15 +122,15 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   unseenRing: {
-    borderColor: '#00A8FF',
-    shadowColor: '#00A8FF',
+    borderColor: Colors.primaryViolet,
+    shadowColor: Colors.primaryViolet,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.45,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOpacity: 0.55,
+    shadowRadius: 6,
+    elevation: 4,
   },
   seenRing: {
-    borderColor: 'rgba(255, 255, 255, 0.18)',
+    borderColor: 'rgba(255, 255, 255, 0.16)',
   },
   avatar: {
     width: 54,
@@ -138,21 +138,21 @@ const styles = StyleSheet.create({
     borderRadius: 27,
   },
   myStoryText: {
-    color: '#8B9BB0',
+    color: Colors.textSecondary,
     fontSize: 11,
     marginTop: 6,
     textAlign: 'center',
     fontWeight: '500',
   },
   nameText: {
-    color: '#8B9BB0',
+    color: Colors.textSecondary,
     fontSize: 11.5,
     marginTop: 6,
     textAlign: 'center',
     fontWeight: '500',
   },
   unseenNameText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
+    color: Colors.primary,
+    fontWeight: '700',
   },
 });

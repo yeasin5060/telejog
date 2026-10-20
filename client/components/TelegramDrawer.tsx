@@ -38,9 +38,9 @@ export default function TelegramDrawer({ visible, onClose, isDarkMode, onToggleD
           <View style={styles.backdrop} />
         </TouchableWithoutFeedback>
 
-        <View style={[styles.drawer, { backgroundColor: isDarkMode ? '#17212B' : '#FFFFFF' }]}>
+        <View style={[styles.drawer, { backgroundColor: isDarkMode ? Colors.surface : '#FFFFFF' }]}>
           {/* Header Profile Info */}
-          <View style={[styles.headerContainer, { backgroundColor: isDarkMode ? '#242F3D' : '#517DA2' }]}>
+          <View style={[styles.headerContainer, { backgroundColor: isDarkMode ? '#1E1B4B' : Colors.primaryViolet }]}>
             <View style={styles.headerTop}>
               <Image source={{ uri: user.avatar || dummyUserProfile.avatar }} style={styles.avatar} />
               <TouchableOpacity onPress={onToggleDarkMode} style={styles.themeToggle}>
@@ -60,59 +60,59 @@ export default function TelegramDrawer({ visible, onClose, isDarkMode, onToggleD
           {/* Drawer Menu Options */}
           <ScrollView style={styles.menuScroll} showsVerticalScrollIndicator={false}>
             <TouchableOpacity style={styles.menuItem} onPress={() => onClose()}>
-              <Ionicons name="people-outline" size={22} color={isDarkMode ? '#7F91A4' : '#707579'} />
+              <Ionicons name="people-outline" size={22} color={isDarkMode ? Colors.textSecondary : '#707579'} />
               <Text style={[styles.menuText, { color: isDarkMode ? '#FFF' : '#000' }]}>New Group</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={() => onClose()}>
-              <Ionicons name="megaphone-outline" size={22} color={isDarkMode ? '#7F91A4' : '#707579'} />
+              <Ionicons name="megaphone-outline" size={22} color={isDarkMode ? Colors.textSecondary : '#707579'} />
               <Text style={[styles.menuText, { color: isDarkMode ? '#FFF' : '#000' }]}>New Channel</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={() => onClose()}>
-              <Ionicons name="person-outline" size={22} color={isDarkMode ? '#7F91A4' : '#707579'} />
+              <Ionicons name="person-outline" size={22} color={isDarkMode ? Colors.textSecondary : '#707579'} />
               <Text style={[styles.menuText, { color: isDarkMode ? '#FFF' : '#000' }]}>Contacts</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={() => onClose()}>
-              <Ionicons name="call-outline" size={22} color={isDarkMode ? '#7F91A4' : '#707579'} />
+              <Ionicons name="call-outline" size={22} color={isDarkMode ? Colors.textSecondary : '#707579'} />
               <Text style={[styles.menuText, { color: isDarkMode ? '#FFF' : '#000' }]}>Calls</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={() => navigateTo('/chat/conv_1')}>
-              <Ionicons name="bookmark-outline" size={22} color={isDarkMode ? '#7F91A4' : '#707579'} />
+              <Ionicons name="bookmark-outline" size={22} color={isDarkMode ? Colors.textSecondary : '#707579'} />
               <Text style={[styles.menuText, { color: isDarkMode ? '#FFF' : '#000' }]}>Saved Messages</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={() => navigateTo('/devices')}>
-              <Ionicons name="laptop-outline" size={22} color={isDarkMode ? '#7F91A4' : '#707579'} />
+              <Ionicons name="laptop-outline" size={22} color={isDarkMode ? Colors.textSecondary : '#707579'} />
               <Text style={[styles.menuText, { color: isDarkMode ? '#FFF' : '#000' }]}>Devices</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={() => navigateTo('/profile')}>
-              <Ionicons name="settings-outline" size={22} color={isDarkMode ? '#7F91A4' : '#707579'} />
+              <Ionicons name="settings-outline" size={22} color={isDarkMode ? Colors.textSecondary : '#707579'} />
               <Text style={[styles.menuText, { color: isDarkMode ? '#FFF' : '#000' }]}>Settings</Text>
             </TouchableOpacity>
 
-            <View style={[styles.divider, { backgroundColor: isDarkMode ? '#101721' : '#E6E8EA' }]} />
+            <View style={[styles.divider, { backgroundColor: isDarkMode ? Colors.divider : '#E6E8EA' }]} />
 
             <TouchableOpacity style={styles.menuItem} onPress={() => onClose()}>
-              <Ionicons name="person-add-outline" size={22} color={isDarkMode ? '#7F91A4' : '#707579'} />
+              <Ionicons name="person-add-outline" size={22} color={isDarkMode ? Colors.textSecondary : '#707579'} />
               <Text style={[styles.menuText, { color: isDarkMode ? '#FFF' : '#000' }]}>Invite Friends</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={() => onClose()}>
-              <Ionicons name="help-circle-outline" size={22} color={isDarkMode ? '#7F91A4' : '#707579'} />
+              <Ionicons name="help-circle-outline" size={22} color={isDarkMode ? Colors.textSecondary : '#707579'} />
               <Text style={[styles.menuText, { color: isDarkMode ? '#FFF' : '#000' }]}>Telejog Features & FAQ</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-              <Ionicons name="log-out-outline" size={22} color="#E53935" />
-              <Text style={[styles.menuText, { color: '#E53935' }]}>Log Out</Text>
+              <Ionicons name="log-out-outline" size={22} color="#FF4757" />
+              <Text style={[styles.menuText, { color: '#FF4757' }]}>Log Out</Text>
             </TouchableOpacity>
 
             <View style={styles.versionContainer}>
-              <Text style={[styles.versionText, { color: isDarkMode ? '#4E5D6E' : '#A2A2A2' }]}>
+              <Text style={[styles.versionText, { color: isDarkMode ? Colors.textMuted : '#A2A2A2' }]}>
                 Telejog for Mobile v3.2.0
               </Text>
             </View>

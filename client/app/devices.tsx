@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { dummyDeviceSessions } from '@/assets/assets';
 import { DeviceSession } from '@/types';
+import { Colors } from '@/constants/Colors';
 
 export default function DevicesScreen() {
   const router = useRouter();
@@ -409,16 +410,16 @@ export default function DevicesScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0B0F17',
+    backgroundColor: Colors.background,
   },
   header: {
     height: 56,
-    backgroundColor: '#0E1420',
+    backgroundColor: Colors.surface,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: Colors.divider,
   },
   backBtn: {
     padding: 6,
@@ -437,16 +438,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   heroCard: {
-    backgroundColor: '#141C2B',
+    backgroundColor: Colors.surfaceCard,
     margin: 16,
     padding: 22,
     borderRadius: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 168, 255, 0.2)',
-    shadowColor: '#00A8FF',
+    borderColor: 'rgba(139, 92, 246, 0.25)',
+    shadowColor: Colors.primaryViolet,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.35,
     shadowRadius: 8,
     elevation: 3,
   },
@@ -454,7 +455,7 @@ const styles = StyleSheet.create({
     width: 76,
     height: 76,
     borderRadius: 38,
-    backgroundColor: 'rgba(0, 168, 255, 0.12)',
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -466,7 +467,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   heroSub: {
-    color: '#8B9BB0',
+    color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
     lineHeight: 18,
@@ -476,14 +477,14 @@ const styles = StyleSheet.create({
   linkDesktopBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.primaryViolet,
     paddingVertical: 12,
     paddingHorizontal: 26,
     borderRadius: 24,
-    shadowColor: '#00A8FF',
+    shadowColor: Colors.primaryViolet,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
     elevation: 4,
   },
   linkDesktopBtnText: {
@@ -496,7 +497,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   sectionHeader: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.8,
@@ -510,31 +511,31 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   sessionCountBadge: {
-    backgroundColor: 'rgba(0, 168, 255, 0.15)',
+    backgroundColor: 'rgba(0, 245, 212, 0.14)',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
     marginLeft: 8,
   },
   sessionCountText: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontSize: 11,
     fontWeight: '700',
   },
   cardContainer: {
-    backgroundColor: '#141C2B',
+    backgroundColor: Colors.surfaceCard,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderColor: 'rgba(139, 92, 246, 0.16)',
     overflow: 'hidden',
   },
   cardEmpty: {
-    backgroundColor: '#141C2B',
+    backgroundColor: Colors.surfaceCard,
     borderRadius: 16,
     padding: 24,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderColor: 'rgba(139, 92, 246, 0.16)',
   },
   emptyTitle: {
     color: '#FFF',
@@ -543,7 +544,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   emptySub: {
-    color: '#8B9BB0',
+    color: Colors.textMuted,
     fontSize: 12,
     marginTop: 2,
   },
@@ -557,7 +558,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(0, 168, 255, 0.12)',
+    backgroundColor: 'rgba(0, 245, 212, 0.14)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -565,7 +566,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#1D283E',
+    backgroundColor: Colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -585,7 +586,7 @@ const styles = StyleSheet.create({
   onlineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    backgroundColor: 'rgba(0, 245, 212, 0.14)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
@@ -595,7 +596,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#00E676',
+    backgroundColor: Colors.online,
     marginRight: 4,
   },
   onlineText: {

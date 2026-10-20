@@ -3,41 +3,50 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Platform, View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Colors } from '@/constants/Colors';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
-  // Dynamic bottom padding & height that guarantees crystal clear visibility on ALL Android & iOS mobile devices
-  const bottomPadding = Math.max(insets.bottom, Platform.OS === 'android' ? 12 : 16);
-  const tabHeight = 60 + bottomPadding;
+  // Dynamic bottom padding calculation ensuring 100% visibility on all Android & iOS devices
+  // Accounts for hardware nav bars, software 3-button nav, and gesture home bars
+  const bottomPadding = Math.max(
+    insets.bottom,
+    Platform.OS === 'android' ? 14 : 18
+  ) + (Platform.OS === 'android' && insets.bottom === 0 ? 8 : 2);
+
+  const tabHeight = 62 + bottomPadding;
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
-        tabBarActiveTintColor: '#00A8FF',
-        tabBarInactiveTintColor: '#8E9EB2',
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.tabInactive,
         tabBarStyle: {
-          backgroundColor: '#121A28',
-          borderTopColor: 'rgba(0, 168, 255, 0.22)',
+          backgroundColor: Colors.tabBarBg,
+          borderTopColor: Colors.tabBarBorder,
           borderTopWidth: 1.5,
           height: tabHeight,
           paddingBottom: bottomPadding,
           paddingTop: 8,
-          shadowColor: '#000',
+          shadowColor: Colors.primaryViolet,
           shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.45,
-          shadowRadius: 10,
-          elevation: 16,
+          shadowOpacity: 0.35,
+          shadowRadius: 12,
+          elevation: 20,
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '700',
+          letterSpacing: 0.3,
           marginTop: 2,
         },
         tabBarItemStyle: {
-          paddingVertical: 3,
+          paddingVertical: 4,
+          alignItems: 'center',
+          justifyContent: 'center',
         },
       }}
     >
@@ -49,8 +58,8 @@ export default function TabLayout() {
             <View style={[styles.iconWrapper, focused && styles.iconWrapperActive]}>
               <Ionicons
                 name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
-                size={23}
-                color={color}
+                size={24}
+                color={focused ? Colors.primary : Colors.tabInactive}
               />
             </View>
           ),
@@ -64,8 +73,8 @@ export default function TabLayout() {
             <View style={[styles.iconWrapper, focused && styles.iconWrapperActive]}>
               <Ionicons
                 name={focused ? 'search' : 'search-outline'}
-                size={23}
-                color={color}
+                size={24}
+                color={focused ? Colors.primary : Colors.tabInactive}
               />
             </View>
           ),
@@ -78,9 +87,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.iconWrapper, focused && styles.iconWrapperActive]}>
               <Ionicons
-                name={focused ? 'person-circle' : 'person-circle-outline'}
+                name={focused ? 'settings' : 'settings-outline'}
                 size={24}
-                color={color}
+                color={focused ? Colors.primary : Colors.tabInactive}
               />
             </View>
           ),
@@ -92,11 +101,20 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   iconWrapper: {
-    paddingHorizontal: 14,
-    paddingVertical: 3,
-    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 1,
   },
   iconWrapperActive: {
-    backgroundColor: 'rgba(0, 168, 255, 0.16)',
+    backgroundColor: 'rgba(0, 245, 212, 0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 245, 212, 0.45)',
+    shadowColor: '#00F5D4',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
   },
 });
