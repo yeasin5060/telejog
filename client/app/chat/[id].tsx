@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { dummyConversationData, dummyMessagesMap } from '@/assets/assets';
 import { Message } from '@/types';
+import ChatHeaderMenu from '@/components/ChatHeaderMenu';
+import WallpaperSelectorModal, { ChatWallpaper, WALLPAPER_PRESETS } from '@/components/WallpaperSelectorModal';
+import ClearHistoryModal from '@/components/ClearHistoryModal';
+import DeleteChatModal from '@/components/DeleteChatModal';
+import VideoCallModal from '@/components/VideoCallModal';
 
 // Quick reaction emojis
 const QUICK_EMOJIS = ['👍', '❤️', '🔥', '😂', '🎉', '👏', '🥰', '🙏'];
@@ -83,6 +88,79 @@ export default function ChatScreen() {
   const [showInputEmojiTray, setShowInputEmojiTray] = useState(false);
   const [highlightedMsgId, setHighlightedMsgId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // 3-Dot Menu & Modals State
+  const [showChatMenu, setShowChatMenu] = useState(false);
+  const [showWallpaperModal, setShowWallpaperModal] = useState(false);
+  const [activeWallpaper, setActiveWallpaper] = useState<ChatWallpaper>(WALLPAPER_PRESETS[0]);
+  const [showClearHistoryModal, setShowClearHistoryModal] = useState(false);
+  const [showDeleteChatModal, setShowDeleteChatModal] = useState(false);
+  const [showVideoCallModal, setShowVideoCallModal] = useState(false);
+
+  // In-Chat Search State
+  const [isSearchingChat, setIsSearchingChat] = useState(false);
+  const [chatSearchQuery, setChatSearchQuery] = useState('');
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+
+  const searchMatches = useMemo(() => {
+    if (!chatSearchQuery.trim()) return [];
+    const q = chatSearchQuery.toLowerCase();
+    return messages.filter((m) => m.text && m.text.toLowerCase().includes(q)).map((m) => m._id);
+  }, [chatSearchQuery, messages]);
+
+  useEffect(() => {
+    if (searchMatches.length > 0) {
+      setCurrentMatchIndex(0);
+      const targetId = searchMatches[0];
+      setHighlightedMsgId(targetId);
+      handleScrollToRepliedMessage(targetId);
+    } else {
+      setHighlightedMsgId(null);
+    }
+  }, [chatSearchQuery]);
+
+  const handleNextSearchMatch = () => {
+    if (searchMatches.length === 0) return;
+    const nextIdx = (currentMatchIndex + 1) % searchMatches.length;
+    setCurrentMatchIndex(nextIdx);
+    const targetId = searchMatches[nextIdx];
+    setHighlightedMsgId(targetId);
+    handleScrollToRepliedMessage(targetId);
+  };
+
+  const handlePrevSearchMatch = () => {
+    if (searchMatches.length === 0) return;
+    const prevIdx = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length;
+    setCurrentMatchIndex(prevIdx);
+    const targetId = searchMatches[prevIdx];
+    setHighlightedMsgId(targetId);
+    handleScrollToRepliedMessage(targetId);
+  };
+
+  const handleConfirmClearHistory = (alsoForFriend: boolean) => {
+    setMessages([]);
+    setShowClearHistoryModal(false);
+    dummyMessagesMap[id as string] = [];
+    showToast(
+      alsoForFriend
+        ? `Messages cleared for both you and ${participantName}`
+        : 'Chat history cleared'
+    );
+  };
+
+  const handleConfirmDeleteChat = (alsoForFriend: boolean) => {
+    setMessages([]);
+    setShowDeleteChatModal(false);
+    dummyMessagesMap[id as string] = [];
+    showToast(
+      alsoForFriend
+        ? `Chat deleted for both you and ${participantName}`
+        : 'Chat deleted'
+    );
+    setTimeout(() => {
+      router.back();
+    }, 400);
+  };
 
   const flatListRef = useRef<FlatList>(null);
   const inputRef = useRef<TextInput>(null);
@@ -276,6 +354,28 @@ export default function ChatScreen() {
     showToast(msg.pinned ? 'Unpinned' : 'Pinned to top');
   };
 
+  const renderMessageText = (text: string) => {
+    if (!isSearchingChat || !chatSearchQuery.trim()) {
+      return <Text style={styles.msgText}>{text}</Text>;
+    }
+    const query = chatSearchQuery.toLowerCase();
+    const lowerText = text.toLowerCase();
+    const index = lowerText.indexOf(query);
+    if (index === -1) {
+      return <Text style={styles.msgText}>{text}</Text>;
+    }
+    const before = text.substring(0, index);
+    const match = text.substring(index, index + query.length);
+    const after = text.substring(index + query.length);
+    return (
+      <Text style={styles.msgText}>
+        {before}
+        <Text style={styles.searchHighlightText}>{match}</Text>
+        {after}
+      </Text>
+    );
+  };
+
   const renderMessageItem = ({ item }: { item: Message }) => {
     const isMe = item.sender === 'current_user';
     const isHighlighted = highlightedMsgId === item._id;
@@ -294,6 +394,14 @@ export default function ChatScreen() {
           style={[
             styles.bubble,
             isMe ? styles.bubbleRight : styles.bubbleLeft,
+            isMe
+              ? {
+                  backgroundColor: activeWallpaper.sentBubbleColor,
+                  borderColor: activeWallpaper.borderColor || Colors.sentBubbleBorder,
+                }
+              : {
+                  backgroundColor: activeWallpaper.receivedBubbleColor,
+                },
             isHighlighted && styles.bubbleHighlighted,
           ]}
         >
@@ -351,7 +459,7 @@ export default function ChatScreen() {
           )}
 
           {/* Message Text */}
-          {item.text && <Text style={styles.msgText}>{item.text}</Text>}
+          {item.text && renderMessageText(item.text)}
 
           {/* Footer Time & Checkmark */}
           <View style={styles.msgFooter}>
@@ -435,20 +543,88 @@ export default function ChatScreen() {
           </TouchableOpacity>
 
           <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.iconBtn}>
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => showToast(`Calling ${participantName}...`)}
+            >
               <Ionicons name="call-outline" size={20} color="#FFF" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconBtn}>
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => setShowVideoCallModal(true)}
+            >
               <Ionicons name="videocam-outline" size={20} color="#FFF" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconBtn}>
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => setShowChatMenu(true)}
+            >
               <Ionicons name="ellipsis-vertical" size={18} color="#FFF" />
             </TouchableOpacity>
           </View>
         </View>
 
+        {/* IN-CHAT REALTIME SEARCH BAR */}
+        {isSearchingChat && (
+          <View style={styles.inChatSearchBar}>
+            <Ionicons name="search" size={18} color={Colors.neonMint} style={{ marginRight: 8 }} />
+            <TextInput
+              style={styles.inChatSearchInput}
+              placeholder="Search in conversation..."
+              placeholderTextColor="#6D7E94"
+              value={chatSearchQuery}
+              onChangeText={setChatSearchQuery}
+              autoFocus
+            />
+            {chatSearchQuery.length > 0 && (
+              <View style={styles.searchMatchControlBox}>
+                <Text style={styles.searchMatchCounter}>
+                  {searchMatches.length > 0
+                    ? `${currentMatchIndex + 1}/${searchMatches.length}`
+                    : '0/0'}
+                </Text>
+                <TouchableOpacity
+                  onPress={handlePrevSearchMatch}
+                  disabled={searchMatches.length === 0}
+                  style={styles.searchArrowBtn}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                >
+                  <Ionicons
+                    name="chevron-up"
+                    size={18}
+                    color={searchMatches.length > 0 ? '#FFF' : '#5E6F85'}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleNextSearchMatch}
+                  disabled={searchMatches.length === 0}
+                  style={styles.searchArrowBtn}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                >
+                  <Ionicons
+                    name="chevron-down"
+                    size={18}
+                    color={searchMatches.length > 0 ? '#FFF' : '#5E6F85'}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+            <TouchableOpacity
+              onPress={() => {
+                setIsSearchingChat(false);
+                setChatSearchQuery('');
+                setHighlightedMsgId(null);
+              }}
+              style={styles.closeSearchBtn}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Ionicons name="close" size={20} color="#8B9BB0" />
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Chat Background & Message List */}
-        <View style={styles.chatBackground}>
+        <View style={[styles.chatBackground, { backgroundColor: activeWallpaper.backgroundColor }]}>
           {/* Telejog Date Chip */}
           <View style={styles.dateChipContainer}>
             <View style={styles.dateChip}>
@@ -813,6 +989,53 @@ export default function ChatScreen() {
             </View>
           </Modal>
         )}
+
+        {/* 3-Dot Dropdown Header Menu */}
+        <ChatHeaderMenu
+          visible={showChatMenu}
+          participantName={participantName}
+          onClose={() => setShowChatMenu(false)}
+          onVideoCall={() => setShowVideoCallModal(true)}
+          onSearch={() => setIsSearchingChat(true)}
+          onSetWallpaper={() => setShowWallpaperModal(true)}
+          onClearHistory={() => setShowClearHistoryModal(true)}
+          onDeleteChat={() => setShowDeleteChatModal(true)}
+        />
+
+        {/* Wallpaper & Theme Selector Modal */}
+        <WallpaperSelectorModal
+          visible={showWallpaperModal}
+          activeWallpaperId={activeWallpaper.id}
+          onSelectWallpaper={(wp) => {
+            setActiveWallpaper(wp);
+            showToast(`Applied ${wp.name} theme`);
+          }}
+          onClose={() => setShowWallpaperModal(false)}
+        />
+
+        {/* Clear History Confirmation Modal */}
+        <ClearHistoryModal
+          visible={showClearHistoryModal}
+          participantName={participantName}
+          onConfirm={handleConfirmClearHistory}
+          onClose={() => setShowClearHistoryModal(false)}
+        />
+
+        {/* Delete Chat Confirmation Modal */}
+        <DeleteChatModal
+          visible={showDeleteChatModal}
+          participantName={participantName}
+          onConfirm={handleConfirmDeleteChat}
+          onClose={() => setShowDeleteChatModal(false)}
+        />
+
+        {/* Video Call Simulator Modal */}
+        <VideoCallModal
+          visible={showVideoCallModal}
+          participantName={participantName}
+          participantAvatar={participantAvatar}
+          onEndCall={() => setShowVideoCallModal(false)}
+        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -831,6 +1054,55 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderBottomWidth: 1,
     borderBottomColor: Colors.divider,
+  },
+  inChatSearchBar: {
+    height: 48,
+    backgroundColor: '#111420',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 42, 133, 0.25)',
+  },
+  inChatSearchInput: {
+    flex: 1,
+    color: '#FFF',
+    fontSize: 14,
+    paddingVertical: 6,
+    ...(Platform.OS === 'web'
+      ? ({
+          outlineStyle: 'none',
+          outlineWidth: 0,
+          outlineColor: 'transparent',
+          boxShadow: 'none',
+        } as any)
+      : {}),
+  },
+  searchMatchControlBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 8,
+    gap: 4,
+  },
+  searchMatchCounter: {
+    color: Colors.neonMint,
+    fontSize: 12,
+    fontWeight: '700',
+    marginRight: 4,
+  },
+  searchArrowBtn: {
+    padding: 4,
+  },
+  closeSearchBtn: {
+    padding: 6,
+    marginLeft: 4,
+  },
+  searchHighlightText: {
+    backgroundColor: '#FFE600',
+    color: '#000',
+    fontWeight: 'bold',
+    borderRadius: 2,
+    paddingHorizontal: 2,
   },
   backBtn: {
     padding: 6,
