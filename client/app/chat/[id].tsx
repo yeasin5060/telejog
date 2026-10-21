@@ -300,7 +300,7 @@ export default function ChatScreen() {
           {/* Pinned Badge */}
           {item.pinned && (
             <View style={styles.pinnedBadge}>
-              <Ionicons name="pin" size={11} color="#00A8FF" />
+              <Ionicons name="pin" size={11} color={Colors.neonMint} />
               <Text style={styles.pinnedText}>Pinned message</Text>
             </View>
           )}
@@ -319,7 +319,7 @@ export default function ChatScreen() {
                   {item.replyTo.text}
                 </Text>
               </View>
-              <Ionicons name="arrow-undo" size={13} color="#00A8FF" style={{ marginLeft: 6 }} />
+              <Ionicons name="arrow-undo" size={13} color={Colors.neonMint} style={{ marginLeft: 6 }} />
             </TouchableOpacity>
           )}
 
@@ -360,7 +360,7 @@ export default function ChatScreen() {
               <Ionicons
                 name={item.read ? 'checkmark-done' : 'checkmark'}
                 size={14}
-                color="#00A8FF"
+                color={Colors.neonMint}
                 style={{ marginLeft: 4 }}
               />
             )}
@@ -413,7 +413,7 @@ export default function ChatScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
-        {/* Modern Telegram Chat Header */}
+        {/* Modern Telejog Chat Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color="#FFF" />
@@ -449,7 +449,7 @@ export default function ChatScreen() {
 
         {/* Chat Background & Message List */}
         <View style={styles.chatBackground}>
-          {/* Telegram Date Chip */}
+          {/* Telejog Date Chip */}
           <View style={styles.dateChipContainer}>
             <View style={styles.dateChip}>
               <Text style={styles.dateChipText}>Today</Text>
@@ -474,7 +474,7 @@ export default function ChatScreen() {
           </View>
         )}
 
-        {/* TELEGRAM FLOATING BOTTOM INPUT DOCK */}
+        {/* TELEJOG FLOATING BOTTOM INPUT DOCK */}
         <View
           style={[
             styles.floatingContainer,
@@ -495,7 +495,7 @@ export default function ChatScreen() {
               {replyingTo && (
                 <View style={styles.floatingReplyPreviewBar}>
                   <View style={styles.floatingReplyAccentLine} />
-                  <Ionicons name="arrow-undo" size={17} color="#00A8FF" style={{ marginHorizontal: 8 }} />
+                  <Ionicons name="arrow-undo" size={17} color={Colors.neonMint} style={{ marginHorizontal: 8 }} />
                   <View style={styles.floatingReplyContent}>
                     <Text style={styles.floatingReplySender} numberOfLines={1}>
                       Replying to {replyingTo.sender === 'current_user' ? 'You' : participantName}
@@ -557,7 +557,7 @@ export default function ChatScreen() {
                   <Ionicons
                     name={showInputEmojiTray ? 'keypad-outline' : 'happy-outline'}
                     size={24}
-                    color={showInputEmojiTray ? '#00A8FF' : '#8B9BB0'}
+                    color={showInputEmojiTray ? Colors.primary : '#8B9BB0'}
                   />
                 </TouchableOpacity>
               </View>
@@ -582,7 +582,7 @@ export default function ChatScreen() {
             )}
           </View>
 
-          {/* IN-APP TELEGRAM EMOJI TRAY */}
+          {/* IN-APP TELEJOG EMOJI TRAY */}
           {showInputEmojiTray && (
             <View
               style={[
@@ -683,18 +683,18 @@ export default function ChatScreen() {
                       style={styles.allEmojisBtn}
                       onPress={() => setShowFullEmojiModal(true)}
                     >
-                      <Ionicons name="add" size={20} color="#00A8FF" />
+                      <Ionicons name="add" size={20} color={Colors.primary} />
                     </TouchableOpacity>
                   </ScrollView>
                 </View>
 
-                {/* 2. TELEGRAM MESSAGE ACTIONS MENU */}
+                {/* 2. TELEJOG MESSAGE ACTIONS MENU */}
                 <View style={styles.menuActionsCard}>
                   <TouchableOpacity
                     style={styles.menuActionRow}
                     onPress={() => handleStartReply(selectedMsgForMenu)}
                   >
-                    <Ionicons name="arrow-undo-outline" size={20} color="#00A8FF" />
+                    <Ionicons name="arrow-undo-outline" size={20} color={Colors.neonMint} />
                     <Text style={styles.menuActionText}>Reply</Text>
                   </TouchableOpacity>
 

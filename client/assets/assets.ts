@@ -303,7 +303,7 @@ export const dummyMessagesMap: Record<string, any[]> = {
             sender: "user_1",
             receiver: "current_user",
             conversationId: "conv_1",
-            text: "Yes! We are matching Telegram's exact color scheme, tabs, drawer menu, and message bubbles.",
+            text: "Yes! Check out Telejog's unique Cyber-Dragonfruit & Neon Mint design, custom logo, and ultra-fast messaging!",
             read: true,
             createdAt: "09:02 AM",
             reactions: [{ emoji: "🔥", count: 3, userReacted: true }],

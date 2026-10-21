@@ -355,7 +355,7 @@ export default function SearchScreen() {
                 <Ionicons
                   name={tab.icon as any}
                   size={14}
-                  color={isActive ? '#00A8FF' : '#8B9BB0'}
+                  color={isActive ? Colors.primary : '#8B9BB0'}
                   style={{ marginRight: 6 }}
                 />
                 <Text
@@ -436,7 +436,7 @@ export default function SearchScreen() {
                       activeOpacity={0.75}
                     >
                       <View style={styles.linkIconCircle}>
-                        <Ionicons name="globe-outline" size={20} color="#00A8FF" />
+                        <Ionicons name="globe-outline" size={20} color={Colors.neonMint} />
                       </View>
                       <View style={styles.linkInfo}>
                         <Text style={styles.linkTitle} numberOfLines={1}>
@@ -483,7 +483,7 @@ export default function SearchScreen() {
                         </Text>
                       </View>
                       <View style={styles.fileDownloadBtn}>
-                        <Ionicons name="arrow-down" size={16} color="#00A8FF" />
+                        <Ionicons name="arrow-down" size={16} color={Colors.primary} />
                       </View>
                     </TouchableOpacity>
                   ))}
@@ -545,7 +545,7 @@ export default function SearchScreen() {
                           onPress={() => handleSelectRecentTag(item)}
                           activeOpacity={0.7}
                         >
-                          <Ionicons name="time-outline" size={14} color="#00A8FF" style={{ marginRight: 6 }} />
+                          <Ionicons name="time-outline" size={14} color={Colors.neonMint} style={{ marginRight: 6 }} />
                           <Text style={styles.searchHistoryTagText}>{item}</Text>
                           <TouchableOpacity
                             onPress={() => handleRemoveRecentTag(item)}
@@ -606,7 +606,7 @@ export default function SearchScreen() {
                               <Ionicons
                                 name="checkmark-circle"
                                 size={14}
-                                color="#00A8FF"
+                                color={Colors.neonMint}
                                 style={{ marginLeft: 4 }}
                               />
                             </View>
@@ -678,7 +678,7 @@ export default function SearchScreen() {
                           <Ionicons
                             name="checkmark-circle"
                             size={15}
-                            color="#00A8FF"
+                            color={Colors.neonMint}
                             style={{ marginLeft: 5 }}
                           />
                         </View>
@@ -694,7 +694,7 @@ export default function SearchScreen() {
                         </View>
                       </View>
                       <View style={styles.topMatchActionBtn}>
-                        <Ionicons name="chatbubble-ellipses" size={16} color="#00A8FF" />
+                        <Ionicons name="chatbubble-ellipses" size={16} color={Colors.primary} />
                         <Text style={styles.topMatchActionText}>Chat</Text>
                       </View>
                     </TouchableOpacity>
@@ -731,7 +731,7 @@ export default function SearchScreen() {
                         <Ionicons
                           name="checkmark-circle"
                           size={14}
-                          color="#00A8FF"
+                          color={Colors.neonMint}
                           style={{ marginLeft: 4 }}
                         />
                       )}
@@ -755,7 +755,7 @@ export default function SearchScreen() {
               !topMatch ? (
                 <View style={styles.emptyContainer}>
                   <View style={styles.emptyIconCircle}>
-                    <Ionicons name="search" size={38} color="#00A8FF" />
+                    <Ionicons name="search" size={38} color={Colors.primary} />
                   </View>
                   <Text style={styles.emptyTitle}>No results found</Text>
                   <Text style={styles.emptySub}>
@@ -934,7 +934,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionHeaderTitle: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontSize: 11.5,
     fontWeight: '800',
     letterSpacing: 0.8,
@@ -948,7 +948,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   clearAllText: {
-    color: '#00A8FF',
+    color: Colors.neonMint,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -965,7 +965,7 @@ const styles = StyleSheet.create({
     padding: 2.5,
     borderRadius: 32,
     borderWidth: 1.5,
-    borderColor: 'rgba(0, 168, 255, 0.4)',
+    borderColor: 'rgba(255, 42, 133, 0.4)',
     backgroundColor: '#141C2B',
   },
   recentAvatar: {
@@ -1029,15 +1029,15 @@ const styles = StyleSheet.create({
   trendingTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 168, 255, 0.08)',
+    backgroundColor: 'rgba(255, 42, 133, 0.08)',
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(0, 168, 255, 0.22)',
+    borderColor: 'rgba(255, 42, 133, 0.22)',
   },
   trendingTagHash: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontWeight: '800',
     fontSize: 13,
     marginRight: 2,
@@ -1085,15 +1085,15 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   joinBtn: {
-    backgroundColor: 'rgba(0, 168, 255, 0.15)',
+    backgroundColor: 'rgba(255, 42, 133, 0.15)',
     paddingHorizontal: 15,
     paddingVertical: 7,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(0, 168, 255, 0.4)',
+    borderColor: 'rgba(255, 42, 133, 0.4)',
   },
   joinBtnText: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontSize: 12.5,
     fontWeight: '700',
   },
@@ -1150,7 +1150,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0, 168, 255, 0.12)',
+    backgroundColor: 'rgba(0, 245, 212, 0.12)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -1165,7 +1165,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   linkDomain: {
-    color: '#00A8FF',
+    color: Colors.neonMint,
     fontSize: 11.5,
     marginTop: 2,
     fontWeight: '600',
@@ -1193,15 +1193,15 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 10,
-    backgroundColor: 'rgba(0, 168, 255, 0.15)',
+    backgroundColor: 'rgba(255, 42, 133, 0.15)',
     borderWidth: 1,
-    borderColor: 'rgba(0, 168, 255, 0.35)',
+    borderColor: 'rgba(255, 42, 133, 0.35)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   fileExtensionText: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontWeight: '800',
     fontSize: 12,
   },
@@ -1222,7 +1222,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: 'rgba(0, 168, 255, 0.1)',
+    backgroundColor: 'rgba(255, 42, 133, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1244,7 +1244,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   topMatchHeading: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 0.8,
@@ -1258,8 +1258,8 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(0, 168, 255, 0.35)',
-    shadowColor: '#00A8FF',
+    borderColor: 'rgba(255, 42, 133, 0.35)',
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
@@ -1292,15 +1292,15 @@ const styles = StyleSheet.create({
   topMatchActionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 168, 255, 0.15)',
+    backgroundColor: 'rgba(255, 42, 133, 0.15)',
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(0, 168, 255, 0.35)',
+    borderColor: 'rgba(255, 42, 133, 0.35)',
   },
   topMatchActionText: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontSize: 12,
     fontWeight: '700',
     marginLeft: 4,
@@ -1361,9 +1361,9 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
   },
   highlightText: {
-    color: '#00A8FF',
+    color: Colors.neonMint,
     fontWeight: 'bold',
-    backgroundColor: 'rgba(0, 168, 255, 0.15)',
+    backgroundColor: 'rgba(0, 245, 212, 0.15)',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -1375,7 +1375,7 @@ const styles = StyleSheet.create({
     width: 76,
     height: 76,
     borderRadius: 38,
-    backgroundColor: 'rgba(0, 168, 255, 0.12)',
+    backgroundColor: 'rgba(255, 42, 133, 0.12)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -1394,15 +1394,15 @@ const styles = StyleSheet.create({
   },
   emptyResetBtn: {
     marginTop: 18,
-    backgroundColor: 'rgba(0, 168, 255, 0.15)',
+    backgroundColor: 'rgba(255, 42, 133, 0.15)',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(0, 168, 255, 0.35)',
+    borderColor: 'rgba(255, 42, 133, 0.35)',
   },
   emptyResetText: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontSize: 13.5,
     fontWeight: '700',
   },

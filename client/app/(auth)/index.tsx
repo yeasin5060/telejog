@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
+import TelejogLogo from '@/components/TelejogLogo';
 
 export default function AuthScreen() {
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
@@ -47,14 +48,7 @@ export default function AuthScreen() {
           {/* Telejog Glowing Logo & Header */}
           <View style={styles.logoContainer}>
             <View style={styles.iconCircleGlow}>
-              <View style={styles.iconCircle}>
-                <Ionicons
-                  name="paper-plane"
-                  size={46}
-                  color="#FFF"
-                  style={{ marginLeft: -3, marginTop: 2 }}
-                />
-              </View>
+              <TelejogLogo size={88} glow={true} />
             </View>
             <Text style={styles.appName}>Telejog</Text>
             <Text style={styles.subTitle}>

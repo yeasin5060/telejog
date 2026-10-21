@@ -109,12 +109,12 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   iconWrapperActive: {
-    backgroundColor: 'rgba(0, 245, 212, 0.16)',
+    backgroundColor: 'rgba(255, 42, 133, 0.18)',
     borderWidth: 1,
-    borderColor: 'rgba(0, 245, 212, 0.45)',
-    shadowColor: '#00F5D4',
+    borderColor: 'rgba(255, 42, 133, 0.5)',
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
   },
 });
