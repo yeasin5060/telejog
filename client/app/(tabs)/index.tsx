@@ -17,7 +17,8 @@ import { Colors } from '@/constants/Colors';
 import { dummyConversationData, dummyStoriesData } from '@/assets/assets';
 import { Conversation, UserStory } from '@/types';
 import StoriesBar from '@/components/StoriesBar';
-import TelegramDrawer from '@/components/TelegramDrawer';
+import TelejogDrawer from '@/components/TelejogDrawer';
+import TelejogLogo from '@/components/TelejogLogo';
 import CategoryFolderTabs, { ChatCategory } from '@/components/CategoryFolderTabs';
 
 export default function MessageScreen() {
@@ -212,8 +213,8 @@ export default function MessageScreen() {
 
             <View style={styles.headerTitleContainer}>
               <View style={styles.brandBadge}>
-                <Ionicons name="paper-plane" size={16} color={Colors.primary} style={{ marginRight: 6 }} />
-                <Text style={styles.headerTitle}>Telejog</Text>
+                <TelejogLogo size={24} glow={false} />
+                <Text style={[styles.headerTitle, { marginLeft: 8 }]}>Telejog</Text>
               </View>
             </View>
 
@@ -271,7 +272,7 @@ export default function MessageScreen() {
       </TouchableOpacity>
 
       {/* Slide Drawer */}
-      <TelegramDrawer
+      <TelejogDrawer
         visible={drawerVisible}
         onClose={() => setDrawerVisible(false)}
         isDarkMode={isDarkMode}

@@ -87,7 +87,7 @@ export default function DevicesScreen() {
           style={styles.qrScanBtn}
           onPress={() => setShowQRModal(true)}
         >
-          <Ionicons name="qr-code-outline" size={22} color="#00A8FF" />
+          <Ionicons name="qr-code-outline" size={22} color={Colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -95,7 +95,7 @@ export default function DevicesScreen() {
         {/* Link Desktop Device Hero Card */}
         <View style={styles.heroCard}>
           <View style={styles.heroIconBox}>
-            <MaterialCommunityIcons name="laptop-account" size={44} color="#00A8FF" />
+            <MaterialCommunityIcons name="laptop-account" size={44} color={Colors.primary} />
           </View>
           <Text style={styles.heroTitle}>Link Telejog Desktop</Text>
           <Text style={styles.heroSub}>
@@ -121,7 +121,7 @@ export default function DevicesScreen() {
                 <Ionicons
                   name={getDeviceIcon(currentDevice.deviceType) as any}
                   size={24}
-                  color="#00A8FF"
+                  color={Colors.neonMint}
                 />
               </View>
 
@@ -170,7 +170,7 @@ export default function DevicesScreen() {
 
           {otherSessions.length === 0 ? (
             <View style={styles.cardEmpty}>
-              <Ionicons name="checkmark-circle-outline" size={32} color="#00A8FF" />
+              <Ionicons name="checkmark-circle-outline" size={32} color={Colors.neonMint} />
               <Text style={styles.emptyTitle}>No other active sessions</Text>
               <Text style={styles.emptySub}>
                 You are only logged in on this mobile device.
@@ -279,13 +279,13 @@ export default function DevicesScreen() {
               </View>
 
               <Text style={styles.qrInstructions}>
-                1. Open <Text style={{ color: '#00A8FF', fontWeight: 'bold' }}>web.telejog.org</Text> on your computer.
+                1. Open <Text style={{ color: Colors.primary, fontWeight: 'bold' }}>web.telejog.org</Text> on your computer.
                 {'\n'}2. Point your camera at the screen to log in.
               </Text>
 
               <View style={styles.qrFrameContainer}>
                 <View style={styles.qrFrameBox}>
-                  <Ionicons name="qr-code" size={160} color="#00A8FF" />
+                  <Ionicons name="qr-code" size={160} color={Colors.primary} />
                   <View style={styles.qrScannerBar} />
                 </View>
                 <Text style={styles.qrScanningText}>Camera active · Scanning...</Text>
@@ -326,7 +326,7 @@ export default function DevicesScreen() {
                   <Ionicons
                     name={getDeviceIcon(selectedSession.deviceType) as any}
                     size={30}
-                    color="#00A8FF"
+                    color={Colors.primary}
                   />
                 </View>
                 <View style={{ marginLeft: 14 }}>
@@ -668,8 +668,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   periodPillActive: {
-    backgroundColor: 'rgba(0, 168, 255, 0.18)',
-    borderColor: '#00A8FF',
+    backgroundColor: 'rgba(255, 42, 133, 0.18)',
+    borderColor: Colors.primary,
   },
   periodPillText: {
     color: '#8B9BB0',
@@ -677,7 +677,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   periodPillTextActive: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontWeight: '700',
   },
   toastContainer: {
@@ -689,7 +689,7 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#00A8FF',
+    borderColor: Colors.primary,
     zIndex: 999,
   },
   toastText: {
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#00A8FF',
+    borderColor: Colors.primary,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -756,22 +756,22 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: 2.5,
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.neonMint,
     top: '50%',
-    shadowColor: '#00A8FF',
+    shadowColor: Colors.neonMint,
     shadowOpacity: 0.8,
     shadowRadius: 6,
     elevation: 4,
   },
   qrScanningText: {
-    color: '#00A8FF',
+    color: Colors.neonMint,
     fontSize: 12,
     marginTop: 8,
   },
   confirmScanBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 22,

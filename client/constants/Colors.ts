@@ -1,115 +1,124 @@
-export const Colors = {
-    // Unique Signature Telejog Palette: Cyber-Amethyst & Electric Mint Aurora
-    primary: "#00F5D4",               // Radiant Hyper-Mint / Aurora Cyan
-    primaryHover: "#05E2C4",
-    primaryViolet: "#8B5CF6",         // Luminescent Cyber Iris
-    primaryPurple: "#7C3AED",
-    primaryGradientStart: "#8B5CF6",   // Cyber Iris
-    primaryGradientEnd: "#00F5D4",     // Hyper-Mint Cyan
-    primaryDark: "#6D28D9",
-    telegramBlue: "#8B5CF6",          // Replaced generic blue with Signature Iris
-    electricBlue: "#00F5D4",
-    neonCyan: "#00F0FF",
-    neonMint: "#00F5D4",
-    neonGreen: "#00F5A0",
-    premiumGold: "#FFD166",
-    goldGradientStart: "#FFE259",
-    goldGradientEnd: "#FFA751",
+// Telejog Signature Brand Theme: Electric Dragonfruit & Hyper-Cyan Mint Aurora
+// 100% Unique, Modern, High-Contrast - Unlike any existing chat application!
 
-    // Backgrounds - Deep Quantum Obsidian & Velvet Void
-    background: "#08090E",
-    backgroundSecondary: "#0D0F18",
-    backgroundLight: "#F5F3FA",
+export const Colors = {
+    // Primary Signature Duo
+    primary: "#FF2A85",                 // Radiant Neon Dragonfruit / Electric Rose
+    primaryHover: "#FF4597",
+    primaryGradientStart: "#FF2A85",   // Electric Dragonfruit
+    primaryGradientEnd: "#00F5D4",     // Hyper-Cyan Mint Aurora
+    primaryViolet: "#FF2A85",          // Used across app for primary accent
+    primaryPurple: "#9333EA",
+    primaryDark: "#C01460",
     
-    // Glass & Surfaces
-    surface: "#121422",
-    surfaceCard: "#16192B",
-    surfaceElevated: "#1C2036",
-    surfaceGlass: "rgba(22, 25, 43, 0.88)",
-    surfaceGlassBorder: "rgba(139, 92, 246, 0.22)",
+    // Complementary Neon Accents
+    neonMint: "#00F5D4",               // Hyper-Cyan Mint (online, checks, highlights)
+    electricBlue: "#00E5FF",           // Electric Cyan
+    neonCyan: "#00F5D4",
+    neonGreen: "#00F5A0",
+    solarAmber: "#FFB703",             // Solar Amber (pinned, premium, stars)
+    premiumGold: "#FFB703",
+    goldGradientStart: "#FFD166",
+    goldGradientEnd: "#FF8C00",
+
+    // Backgrounds - Deep Obsidian Void
+    background: "#07080D",             // Deep Space Quantum Void
+    backgroundSecondary: "#0C0E14",     // Midnight Velvet
+    backgroundLight: "#F8F7FC",
+    
+    // Surfaces & Card Containers
+    surface: "#11131C",               // Obsidian Slate
+    surfaceCard: "#151824",           // Midnight Card
+    surfaceElevated: "#1B1F30",       // Elevated Plate
+    surfaceGlass: "rgba(21, 24, 36, 0.92)",
+    surfaceGlassBorder: "rgba(255, 42, 133, 0.22)",
     surfaceLight: "#FFFFFF",
     
-    // Message Bubbles - Jewel Iris & Midnight Titanium
-    sentBubble: "#5B21B6",             // Majestic Royal Iris
-    sentBubbleGradient: "#7C3AED",     // Vibrant Iris Flare
-    sentBubbleBorder: "rgba(0, 245, 212, 0.3)",
-    receivedBubble: "#16192B",         // Deep Midnight Titanium
-    receivedBubbleBorder: "rgba(139, 92, 246, 0.16)",
-    sentBubbleLight: "#EDE9FE",
+    // Message Bubbles - Velvet Dragonfruit & Midnight Obsidian
+    sentBubble: "#8B124B",             // Rich Glowing Velvet Dragonfruit
+    sentBubbleGradient: "#B8175E",     // Luminous Flare
+    sentBubbleBorder: "rgba(255, 42, 133, 0.45)",
+    receivedBubble: "#151824",         // Midnight Obsidian
+    receivedBubbleBorder: "rgba(0, 245, 212, 0.18)",
+    sentBubbleLight: "#FFE4EF",
     receivedBubbleLight: "#FFFFFF",
     
-    // Text Hierarchy - Ultra High Contrast & Readability
+    // Typography Hierarchy
     textPrimary: "#FFFFFF",
     textSecondary: "#CBD5E1",          // High contrast bright slate
-    textMuted: "#94A3B8",              // Clearly visible muted text
+    textMuted: "#94A3B8",              // Clearly legible muted grey
     textPrimaryLight: "#0F172A",
     textSecondaryLight: "#64748B",
     
     // Status, Badges & Accents
-    online: "#00F5D4",                 // Hyper-Mint online dot
-    onlineGlow: "rgba(0, 245, 212, 0.4)",
-    unreadBadge: "#00F5D4",            // Hyper-Mint badge with dark text for maximum pop
-    unreadBadgeText: "#08090E",
-    checkIcon: "#00F5D4",
+    online: "#00F5D4",                 // Hyper-Mint glow
+    onlineGlow: "rgba(0, 245, 212, 0.45)",
+    unreadBadge: "#FF2A85",            // Neon Dragonfruit
+    unreadBadgeText: "#FFFFFF",
+    checkIcon: "#00F5D4",              // Hyper-Mint double ticks
     error: "#FF4757",
-    warning: "#FFA502",
-    divider: "rgba(139, 92, 246, 0.12)",
+    warning: "#FFB703",
+    divider: "rgba(255, 42, 133, 0.12)",
     dividerLight: "#E2E8F0",
 
-    // Tab Bar Styling
-    tabActive: "#00F5D4",
+    // Bottom Tab Bar
+    tabActive: "#FF2A85",
     tabInactive: "#94A3B8",
-    tabBarBg: "#0D0F1A",
-    tabBarBorder: "rgba(139, 92, 246, 0.28)",
+    tabBarBg: "#0C0E14",
+    tabBarBorder: "rgba(255, 42, 133, 0.28)",
 
-    // Backward compatibility aliases
+    // Compatibility Aliases for components
+    telegramBlue: "#FF2A85",           // Replaced legacy alias with Telejog brand
     onSurface: "#FFFFFF",
     onSurfaceVariant: "#CBD5E1",
-    surfaceLowest: "#08090E",
-    surfaceLow: "#0D0F18",
-    surfaceHigh: "#16192B",
-    surfaceHighest: "#1C2036",
-    surfaceDim: "#08090E",
+    surfaceLowest: "#07080D",
+    surfaceLow: "#0C0E14",
+    surfaceHigh: "#151824",
+    surfaceHighest: "#1B1F30",
+    surfaceDim: "#07080D",
     outline: "#94A3B8",
-    outlineVariant: "#252B44",
-    onPrimary: "#08090E",              // Dark contrast on neon primary
-    primaryDim: "#6D28D9",
-    primaryContainer: "#8B5CF6",
+    outlineVariant: "#262A3B",
+    onPrimary: "#FFFFFF",
+    primaryDim: "#C01460",
+    primaryContainer: "#FF2A85",
     onPrimaryContainer: "#FFFFFF",
-    tertiary: "#00F0FF",
+    tertiary: "#00F5D4",
 };
 
-export const TelegramTheme = {
+export const TelejogTheme = {
   dark: {
-    bg: "#08090E",
-    header: "#121422",
-    card: "#16192B",
-    cardElevated: "#1C2036",
+    bg: "#07080D",
+    header: "#11131C",
+    card: "#151824",
+    cardElevated: "#1B1F30",
     text: "#FFFFFF",
     subtext: "#CBD5E1",
     muted: "#94A3B8",
-    inputBg: "#1C2036",
-    sentMsg: "#5B21B6",
-    receivedMsg: "#16192B",
-    border: "rgba(139, 92, 246, 0.22)",
-    accent: "#00F5D4",
-    accentAlt: "#8B5CF6",
+    inputBg: "#1B1F30",
+    sentMsg: "#8B124B",
+    receivedMsg: "#151824",
+    border: "rgba(255, 42, 133, 0.22)",
+    accent: "#FF2A85",
+    accentAlt: "#00F5D4",
     online: "#00F5D4",
   },
   light: {
-    bg: "#F5F3FA",
-    header: "#7C3AED",
+    bg: "#F8F7FC",
+    header: "#FF2A85",
     card: "#FFFFFF",
     cardElevated: "#F8FAFC",
     text: "#0F172A",
     subtext: "#64748B",
     muted: "#94A3B8",
-    inputBg: "#EDE9FE",
-    sentMsg: "#DDD6FE",
+    inputBg: "#FFE4EF",
+    sentMsg: "#FFD0E3",
     receivedMsg: "#FFFFFF",
     border: "#E2E8F0",
-    accent: "#7C3AED",
-    accentAlt: "#05E2C4",
-    online: "#10B981",
+    accent: "#FF2A85",
+    accentAlt: "#00BFA5",
+    online: "#00BFA5",
   }
 };
+
+// Legacy compatibility export
+export const TelegramTheme = TelejogTheme;

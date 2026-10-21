@@ -108,7 +108,7 @@ export default function ProfileScreen() {
       <View style={styles.topBar}>
         <Text style={styles.topBarTitle}>Settings</Text>
         <TouchableOpacity style={styles.editHeaderBtn} onPress={handleOpenEditModal} activeOpacity={0.7}>
-          <Ionicons name="create-outline" size={19} color="#00A8FF" style={{ marginRight: 4 }} />
+          <Ionicons name="create-outline" size={19} color={Colors.primary} style={{ marginRight: 4 }} />
           <Text style={styles.editHeaderBtnText}>Edit</Text>
         </TouchableOpacity>
       </View>
@@ -125,7 +125,7 @@ export default function ProfileScreen() {
 
           <View style={styles.nameRow}>
             <Text style={styles.nameText}>{user.name}</Text>
-            <Ionicons name="checkmark-circle" size={18} color="#00A8FF" style={{ marginLeft: 6 }} />
+            <Ionicons name="checkmark-circle" size={18} color={Colors.neonMint} style={{ marginLeft: 6 }} />
           </View>
           <Text style={styles.handleText}>@{user.handle}</Text>
 
@@ -140,8 +140,8 @@ export default function ProfileScreen() {
           <Text style={styles.sectionHeader}>ACCOUNT</Text>
           <View style={styles.cardContainer}>
             <TouchableOpacity style={styles.infoRow} onPress={handleOpenEditModal} activeOpacity={0.7}>
-              <View style={[styles.iconBox, { backgroundColor: 'rgba(0, 168, 255, 0.15)' }]}>
-                <Ionicons name="call" size={18} color="#00A8FF" />
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(255, 42, 133, 0.15)' }]}>
+                <Ionicons name="call" size={18} color={Colors.primary} />
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoTitle}>{user.phone || '+880 1700-000000'}</Text>
@@ -178,7 +178,7 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Telegram Settings Options */}
+        {/* Telejog Settings Options */}
         <View style={styles.sectionWrapper}>
           <Text style={styles.sectionHeader}>SETTINGS</Text>
           <View style={styles.cardContainer}>
@@ -188,8 +188,8 @@ export default function ProfileScreen() {
               onPress={() => router.push('/devices')}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconBox, { backgroundColor: 'rgba(0, 168, 255, 0.15)' }]}>
-                <Ionicons name="laptop-outline" size={18} color="#00A8FF" />
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(0, 245, 212, 0.15)' }]}>
+                <Ionicons name="laptop-outline" size={18} color={Colors.neonMint} />
               </View>
               <View style={{ flex: 1, marginLeft: 14 }}>
                 <Text style={styles.menuTitle}>Devices</Text>
@@ -231,7 +231,7 @@ export default function ProfileScreen() {
               <Switch
                 value={notifications}
                 onValueChange={setNotifications}
-                trackColor={{ false: '#1D283E', true: '#00A8FF' }}
+                trackColor={{ false: '#1D283E', true: Colors.primary }}
                 thumbColor="#FFF"
               />
             </TouchableOpacity>
@@ -256,7 +256,7 @@ export default function ProfileScreen() {
               <Switch
                 value={isNightMode}
                 onValueChange={setIsNightMode}
-                trackColor={{ false: '#1D283E', true: '#00A8FF' }}
+                trackColor={{ false: '#1D283E', true: Colors.primary }}
                 thumbColor="#FFF"
               />
             </TouchableOpacity>
@@ -771,7 +771,7 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   saveModalBtnText: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontSize: 15,
     fontWeight: 'bold',
   },
@@ -790,7 +790,7 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 45,
     borderWidth: 2,
-    borderColor: '#00A8FF',
+    borderColor: Colors.primary,
     marginBottom: 10,
   },
   chooseAvatarLabel: {
@@ -812,7 +812,7 @@ const styles = StyleSheet.create({
   },
   presetAvatarBtnSelected: {
     borderWidth: 2,
-    borderColor: '#00A8FF',
+    borderColor: Colors.primary,
   },
   presetAvatarThumb: {
     width: 52,
@@ -823,7 +823,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.primary,
     width: 18,
     height: 18,
     borderRadius: 9,
@@ -843,7 +843,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   inputLabel: {
-    color: '#00A8FF',
+    color: Colors.primary,
     fontSize: 12,
     fontWeight: 'bold',
     marginBottom: 4,
@@ -887,12 +887,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#00A8FF',
+    backgroundColor: Colors.primary,
     marginHorizontal: 16,
     marginTop: 24,
     paddingVertical: 14,
     borderRadius: 14,
-    shadowColor: '#00A8FF',
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 6,
