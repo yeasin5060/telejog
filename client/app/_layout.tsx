@@ -3,10 +3,16 @@ import { Platform } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import { store } from "@/store";
 import { useAppSelector } from "@/store/hooks";
+import { useFonts } from "expo-font";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import * as SplashScreen from "expo-splash-screen";
+
+// Keep the native splash screen visible while fonts and assets load
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 // Bulletproof global outline reset for Web to eliminate default browser focus rings & outlines
 if (Platform.OS === "web" && typeof document !== "undefined") {
@@ -61,6 +67,17 @@ function AuthNavigationGuard() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    ...Ionicons.font,
+    ...MaterialCommunityIcons.font,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [fontsLoaded, fontError]);
+
   useEffect(() => {
     if (Platform.OS === "web" && typeof document !== "undefined") {
       const styleId = "telejog-web-outline-reset";
@@ -102,7 +119,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <Provider store={store}>
           <AuthNavigationGuard />
           <Stack screenOptions={{ headerShown: false }}>

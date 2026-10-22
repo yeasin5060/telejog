@@ -7,15 +7,14 @@ import { Colors } from '@/constants/Colors';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  const isAndroid = Platform.OS === 'android';
 
-  // Dynamic bottom padding calculation ensuring 100% visibility on all Android & iOS devices
+  // Dynamic bottom inset calculation ensuring full visibility on all Android & iOS devices
   // Accounts for hardware nav bars, software 3-button nav, and gesture home bars
-  const bottomPadding = Math.max(
-    insets.bottom,
-    Platform.OS === 'android' ? 14 : 18
-  ) + (Platform.OS === 'android' && insets.bottom === 0 ? 8 : 2);
+  const bottomInset = insets.bottom > 0 ? insets.bottom : (isAndroid ? 16 : 12);
 
-  const tabHeight = 62 + bottomPadding;
+  // Sufficient height so tab items, icons, and labels are 100% visible and never clipped
+  const tabHeight = (isAndroid ? 68 : 64) + bottomInset;
 
   return (
     <Tabs
@@ -29,7 +28,7 @@ export default function TabLayout() {
           borderTopColor: Colors.tabBarBorder,
           borderTopWidth: 1.5,
           height: tabHeight,
-          paddingBottom: bottomPadding,
+          paddingBottom: bottomInset,
           paddingTop: 8,
           shadowColor: Colors.primaryViolet,
           shadowOffset: { width: 0, height: -4 },
@@ -44,7 +43,6 @@ export default function TabLayout() {
           marginTop: 2,
         },
         tabBarItemStyle: {
-          paddingVertical: 4,
           alignItems: 'center',
           justifyContent: 'center',
         },
@@ -59,7 +57,7 @@ export default function TabLayout() {
               <Ionicons
                 name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
                 size={24}
-                color={focused ? Colors.primary : Colors.tabInactive}
+                color={color}
               />
             </View>
           ),
@@ -74,7 +72,7 @@ export default function TabLayout() {
               <Ionicons
                 name={focused ? 'search' : 'search-outline'}
                 size={24}
-                color={focused ? Colors.primary : Colors.tabInactive}
+                color={color}
               />
             </View>
           ),
@@ -89,7 +87,7 @@ export default function TabLayout() {
               <Ionicons
                 name={focused ? 'settings' : 'settings-outline'}
                 size={24}
-                color={focused ? Colors.primary : Colors.tabInactive}
+                color={color}
               />
             </View>
           ),
@@ -101,20 +99,15 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   iconWrapper: {
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-    borderRadius: 16,
+    minWidth: 44,
+    height: 30,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 1,
   },
   iconWrapperActive: {
     backgroundColor: 'rgba(255, 42, 133, 0.18)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 42, 133, 0.5)',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.6,
-    shadowRadius: 6,
+    borderColor: 'rgba(255, 42, 133, 0.45)',
   },
 });
