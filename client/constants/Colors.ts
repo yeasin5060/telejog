@@ -34,13 +34,13 @@ export const Colors = {
     surfaceGlassBorder: "rgba(255, 42, 133, 0.22)",
     surfaceLight: "#FFFFFF",
     
-    // Message Bubbles - Velvet Dragonfruit & Midnight Obsidian
-    sentBubble: "#8B124B",             // Rich Glowing Velvet Dragonfruit
-    sentBubbleGradient: "#B8175E",     // Luminous Flare
-    sentBubbleBorder: "rgba(255, 42, 133, 0.45)",
-    receivedBubble: "#151824",         // Midnight Obsidian
-    receivedBubbleBorder: "rgba(0, 245, 212, 0.18)",
-    sentBubbleLight: "#FFE4EF",
+    // Message Bubbles - Telegram Theme (Ocean Slate Blue & Midnight Card)
+    sentBubble: "#2B5278",             // Authentic Telegram Slate Blue
+    sentBubbleGradient: "#34628E",     // Luminous Slate
+    sentBubbleBorder: "rgba(83, 169, 230, 0.22)",
+    receivedBubble: "#182533",         // Authentic Telegram Deep Midnight Card
+    receivedBubbleBorder: "rgba(255, 255, 255, 0.05)",
+    sentBubbleLight: "#EFFDDE",        // Telegram Day soft mint green
     receivedBubbleLight: "#FFFFFF",
     
     // Typography Hierarchy
