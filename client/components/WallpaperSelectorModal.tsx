@@ -13,6 +13,8 @@ import { Colors } from '@/constants/Colors';
 
 const { width } = Dimensions.get('window');
 
+import TelegramChatPattern from './TelegramChatPattern';
+
 export interface ChatWallpaper {
   id: string;
   name: string;
@@ -27,24 +29,81 @@ export interface ChatWallpaper {
 
 export const WALLPAPER_PRESETS: ChatWallpaper[] = [
   {
+    id: 'telegram-classic-dark',
+    name: 'Telegram Classic Dark',
+    category: 'Official Telegram',
+    backgroundColor: '#0E1621',
+    accentColor: '#2AABEE',
+    sentBubbleColor: '#2B5278',
+    receivedBubbleColor: '#182533',
+    borderColor: 'rgba(83, 169, 230, 0.22)',
+    hasPattern: true,
+  },
+  {
+    id: 'telegram-day-mint',
+    name: 'Telegram Classic Day',
+    category: 'Light Mint',
+    backgroundColor: '#8EAEC4',
+    accentColor: '#24A1DE',
+    sentBubbleColor: '#EFFDDE',
+    receivedBubbleColor: '#FFFFFF',
+    borderColor: 'rgba(0, 0, 0, 0.08)',
+    hasPattern: true,
+  },
+  {
+    id: 'telegram-arctic-night',
+    name: 'Telegram Arctic Night',
+    category: 'Deep Midnight',
+    backgroundColor: '#080C11',
+    accentColor: '#53A9E6',
+    sentBubbleColor: '#1E3B5A',
+    receivedBubbleColor: '#141D26',
+    borderColor: 'rgba(83, 169, 230, 0.25)',
+    hasPattern: true,
+  },
+  {
+    id: 'telegram-desert-amber',
+    name: 'Telegram Warm Desert',
+    category: 'Warm Tone',
+    backgroundColor: '#1A1410',
+    accentColor: '#FF9500',
+    sentBubbleColor: '#3D2B1F',
+    receivedBubbleColor: '#241D17',
+    borderColor: 'rgba(255, 149, 0, 0.25)',
+    hasPattern: true,
+  },
+  {
+    id: 'telegram-emerald-forest',
+    name: 'Telegram Forest',
+    category: 'Emerald Green',
+    backgroundColor: '#0A1712',
+    accentColor: '#34D399',
+    sentBubbleColor: '#16382B',
+    receivedBubbleColor: '#10221A',
+    borderColor: 'rgba(52, 211, 153, 0.25)',
+    hasPattern: true,
+  },
+  {
+    id: 'telegram-amethyst-velvet',
+    name: 'Telegram Amethyst',
+    category: 'Velvet Purple',
+    backgroundColor: '#120D1D',
+    accentColor: '#A78BFA',
+    sentBubbleColor: '#31204D',
+    receivedBubbleColor: '#1A1429',
+    borderColor: 'rgba(167, 139, 250, 0.25)',
+    hasPattern: true,
+  },
+  {
     id: 'telejog-obsidian',
-    name: 'Telejog Obsidian',
-    category: 'Default Brand',
+    name: 'Telejog Dragonfruit',
+    category: 'Neon Signature',
     backgroundColor: '#07080D',
     accentColor: '#FF2A85',
     sentBubbleColor: '#8B124B',
     receivedBubbleColor: '#151824',
     borderColor: '#FF2A85',
-  },
-  {
-    id: 'neon-dragonfruit',
-    name: 'Dragonfruit Glow',
-    category: 'Vibrant',
-    backgroundColor: '#16020F',
-    accentColor: '#FF2A85',
-    sentBubbleColor: '#9C0D50',
-    receivedBubbleColor: '#24091A',
-    borderColor: '#FF2A85',
+    hasPattern: true,
   },
   {
     id: 'cyber-mint',
@@ -54,66 +113,6 @@ export const WALLPAPER_PRESETS: ChatWallpaper[] = [
     accentColor: '#00F5D4',
     sentBubbleColor: '#006D5E',
     receivedBubbleColor: '#0B211B',
-    borderColor: '#00F5D4',
-  },
-  {
-    id: 'midnight-nebula',
-    name: 'Midnight Nebula',
-    category: 'Cosmic',
-    backgroundColor: '#0B0720',
-    accentColor: '#A855F7',
-    sentBubbleColor: '#581C87',
-    receivedBubbleColor: '#171131',
-    borderColor: '#A855F7',
-  },
-  {
-    id: 'solar-eclipse',
-    name: 'Solar Eclipse',
-    category: 'Warm Glow',
-    backgroundColor: '#180B03',
-    accentColor: '#FF8A00',
-    sentBubbleColor: '#8C3D00',
-    receivedBubbleColor: '#26160C',
-    borderColor: '#FF8A00',
-  },
-  {
-    id: 'royal-emerald',
-    name: 'Royal Emerald',
-    category: 'Elegance',
-    backgroundColor: '#03160D',
-    accentColor: '#10B981',
-    sentBubbleColor: '#065F46',
-    receivedBubbleColor: '#0D2418',
-    borderColor: '#10B981',
-  },
-  {
-    id: 'electric-sapphire',
-    name: 'Electric Sapphire',
-    category: 'Deep Blue',
-    backgroundColor: '#050E24',
-    accentColor: '#38BDF8',
-    sentBubbleColor: '#0369A1',
-    receivedBubbleColor: '#0F1A34',
-    borderColor: '#38BDF8',
-  },
-  {
-    id: 'stealth-carbon',
-    name: 'Stealth Carbon',
-    category: 'Minimalist',
-    backgroundColor: '#0F1116',
-    accentColor: '#94A3B8',
-    sentBubbleColor: '#334155',
-    receivedBubbleColor: '#1E232B',
-    borderColor: '#64748B',
-  },
-  {
-    id: 'doodle-matrix',
-    name: 'Tech Doodle Matrix',
-    category: 'Pattern',
-    backgroundColor: '#0A0D14',
-    accentColor: '#00F5D4',
-    sentBubbleColor: '#1A2338',
-    receivedBubbleColor: '#141822',
     borderColor: '#00F5D4',
     hasPattern: true,
   },
@@ -176,9 +175,14 @@ export default function WallpaperSelectorModal({
                       style={[
                         styles.previewBox,
                         { backgroundColor: item.backgroundColor },
-                        item.hasPattern && styles.patternOverlay,
                       ]}
                     >
+                      {item.hasPattern && (
+                        <TelegramChatPattern
+                          color="#FFFFFF"
+                          opacity={item.id.includes('day') ? 0.15 : 0.08}
+                        />
+                      )}
                       {/* Received Mini Bubble */}
                       <View
                         style={[

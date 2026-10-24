@@ -21,6 +21,7 @@ import { dummyConversationData, dummyMessagesMap } from '@/assets/assets';
 import { Message } from '@/types';
 import ChatHeaderMenu from '@/components/ChatHeaderMenu';
 import WallpaperSelectorModal, { ChatWallpaper, WALLPAPER_PRESETS } from '@/components/WallpaperSelectorModal';
+import TelegramChatPattern from '@/components/TelegramChatPattern';
 import ClearHistoryModal from '@/components/ClearHistoryModal';
 import DeleteChatModal from '@/components/DeleteChatModal';
 import VideoCallModal from '@/components/VideoCallModal';
@@ -354,21 +355,23 @@ export default function ChatScreen() {
     showToast(msg.pinned ? 'Unpinned' : 'Pinned to top');
   };
 
-  const renderMessageText = (text: string) => {
+  const renderMessageText = (text: string, isMe?: boolean) => {
+    const isLightBubble = isMe && activeWallpaper.sentBubbleColor === '#EFFDDE';
+    const textColor = isLightBubble ? '#111827' : '#FFFFFF';
     if (!isSearchingChat || !chatSearchQuery.trim()) {
-      return <Text style={styles.msgText}>{text}</Text>;
+      return <Text style={[styles.msgText, { color: textColor }]}>{text}</Text>;
     }
     const query = chatSearchQuery.toLowerCase();
     const lowerText = text.toLowerCase();
     const index = lowerText.indexOf(query);
     if (index === -1) {
-      return <Text style={styles.msgText}>{text}</Text>;
+      return <Text style={[styles.msgText, { color: textColor }]}>{text}</Text>;
     }
     const before = text.substring(0, index);
     const match = text.substring(index, index + query.length);
     const after = text.substring(index + query.length);
     return (
-      <Text style={styles.msgText}>
+      <Text style={[styles.msgText, { color: textColor }]}>
         {before}
         <Text style={styles.searchHighlightText}>{match}</Text>
         {after}
@@ -397,10 +400,11 @@ export default function ChatScreen() {
             isMe
               ? {
                   backgroundColor: activeWallpaper.sentBubbleColor,
-                  borderColor: activeWallpaper.borderColor || Colors.sentBubbleBorder,
+                  borderColor: activeWallpaper.borderColor || 'rgba(83, 169, 230, 0.22)',
                 }
               : {
                   backgroundColor: activeWallpaper.receivedBubbleColor,
+                  borderColor: 'rgba(255, 255, 255, 0.05)',
                 },
             isHighlighted && styles.bubbleHighlighted,
           ]}
@@ -408,8 +412,10 @@ export default function ChatScreen() {
           {/* Pinned Badge */}
           {item.pinned && (
             <View style={styles.pinnedBadge}>
-              <Ionicons name="pin" size={11} color={Colors.neonMint} />
-              <Text style={styles.pinnedText}>Pinned message</Text>
+              <Ionicons name="pin" size={11} color={activeWallpaper.accentColor || '#53A9E6'} />
+              <Text style={[styles.pinnedText, { color: activeWallpaper.accentColor || '#53A9E6' }]}>
+                Pinned message
+              </Text>
             </View>
           )}
 
@@ -418,16 +424,26 @@ export default function ChatScreen() {
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => handleScrollToRepliedMessage(item.replyTo!._id)}
-              style={styles.replyBox}
+              style={[
+                styles.replyBox,
+                { borderLeftColor: activeWallpaper.accentColor || '#53A9E6' },
+              ]}
             >
               <View style={styles.replyBarAccent} />
               <View style={{ flex: 1 }}>
-                <Text style={styles.replySender}>{item.replyTo.senderName}</Text>
+                <Text style={[styles.replySender, { color: activeWallpaper.accentColor || '#53A9E6' }]}>
+                  {item.replyTo.senderName}
+                </Text>
                 <Text style={styles.replyText} numberOfLines={2}>
                   {item.replyTo.text}
                 </Text>
               </View>
-              <Ionicons name="arrow-undo" size={13} color={Colors.neonMint} style={{ marginLeft: 6 }} />
+              <Ionicons
+                name="arrow-undo"
+                size={13}
+                color={activeWallpaper.accentColor || '#53A9E6'}
+                style={{ marginLeft: 6 }}
+              />
             </TouchableOpacity>
           )}
 
@@ -438,37 +454,64 @@ export default function ChatScreen() {
             </TouchableOpacity>
           )}
 
-          {/* Voice Note Attachment with Neon Waveform */}
+          {/* Voice Note Attachment with Waveform */}
           {item.mediaType === 'voice' && (
             <View style={styles.voiceContainer}>
-              <TouchableOpacity style={styles.playBtn}>
+              <TouchableOpacity
+                style={[
+                  styles.playBtn,
+                  {
+                    backgroundColor: activeWallpaper.accentColor || '#2AABEE',
+                    shadowColor: activeWallpaper.accentColor || '#2AABEE',
+                  },
+                ]}
+              >
                 <Ionicons name="play" size={17} color="#FFF" style={{ marginLeft: 2 }} />
               </TouchableOpacity>
               <View style={styles.waveformBox}>
-                <View style={[styles.waveLine, { height: 10 }]} />
-                <View style={[styles.waveLine, { height: 22 }]} />
-                <View style={[styles.waveLine, { height: 8 }]} />
-                <View style={[styles.waveLine, { height: 26 }]} />
-                <View style={[styles.waveLine, { height: 16 }]} />
-                <View style={[styles.waveLine, { height: 12 }]} />
-                <View style={[styles.waveLine, { height: 20 }]} />
-                <View style={[styles.waveLine, { height: 14 }]} />
+                {[10, 22, 8, 26, 16, 12, 20, 14].map((h, idx) => (
+                  <View
+                    key={idx}
+                    style={[
+                      styles.waveLine,
+                      {
+                        height: h,
+                        backgroundColor: activeWallpaper.accentColor || '#53A9E6',
+                      },
+                    ]}
+                  />
+                ))}
               </View>
               <Text style={styles.voiceDuration}>{item.voiceDuration || '0:15'}</Text>
             </View>
           )}
 
           {/* Message Text */}
-          {item.text && renderMessageText(item.text)}
+          {item.text && renderMessageText(item.text, isMe)}
 
           {/* Footer Time & Checkmark */}
           <View style={styles.msgFooter}>
-            <Text style={styles.msgTime}>{item.createdAt}</Text>
+            <Text
+              style={[
+                styles.msgTime,
+                isMe && activeWallpaper.sentBubbleColor === '#EFFDDE'
+                  ? { color: '#5C7A58' }
+                  : isMe
+                  ? { color: '#7FA6C7' }
+                  : { color: '#708499' },
+              ]}
+            >
+              {item.createdAt}
+            </Text>
             {isMe && (
               <Ionicons
                 name={item.read ? 'checkmark-done' : 'checkmark'}
-                size={14}
-                color={Colors.neonMint}
+                size={15}
+                color={
+                  activeWallpaper.sentBubbleColor === '#EFFDDE'
+                    ? '#4FAE4E'
+                    : (activeWallpaper.accentColor || '#53A9E6')
+                }
                 style={{ marginLeft: 4 }}
               />
             )}
@@ -625,7 +668,15 @@ export default function ChatScreen() {
 
         {/* Chat Background & Message List */}
         <View style={[styles.chatBackground, { backgroundColor: activeWallpaper.backgroundColor }]}>
-          {/* Telejog Date Chip */}
+          {/* Telegram Iconic Doodle Wallpaper Pattern */}
+          {activeWallpaper.hasPattern !== false && (
+            <TelegramChatPattern
+              color="#FFFFFF"
+              opacity={activeWallpaper.id.includes('day') ? 0.12 : 0.065}
+            />
+          )}
+
+          {/* Telegram Date Chip */}
           <View style={styles.dateChipContainer}>
             <View style={styles.dateChip}>
               <Text style={styles.dateChipText}>Today</Text>
@@ -1048,21 +1099,21 @@ const styles = StyleSheet.create({
   },
   header: {
     height: 58,
-    backgroundColor: Colors.surface,
+    backgroundColor: '#17212B',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.divider,
+    borderBottomColor: 'rgba(0, 0, 0, 0.35)',
   },
   inChatSearchBar: {
     height: 48,
-    backgroundColor: '#111420',
+    backgroundColor: '#17212B',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 42, 133, 0.25)',
+    borderBottomColor: 'rgba(83, 169, 230, 0.25)',
   },
   inChatSearchInput: {
     flex: 1,
@@ -1085,7 +1136,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   searchMatchCounter: {
-    color: Colors.neonMint,
+    color: '#53A9E6',
     fontSize: 12,
     fontWeight: '700',
     marginRight: 4,
@@ -1129,9 +1180,9 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: Colors.online,
+    backgroundColor: '#53A9E6',
     borderWidth: 2,
-    borderColor: Colors.surface,
+    borderColor: '#17212B',
   },
   headerInfo: {
     marginLeft: 10,
@@ -1148,7 +1199,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   headerStatusOnline: {
-    color: Colors.online,
+    color: '#53A9E6',
     fontWeight: '600',
   },
   headerActions: {
@@ -1166,23 +1217,28 @@ const styles = StyleSheet.create({
   },
   chatBackground: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#0E1621',
   },
   dateChipContainer: {
     alignItems: 'center',
     marginVertical: 12,
   },
   dateChip: {
-    backgroundColor: 'rgba(22, 25, 43, 0.88)',
-    paddingHorizontal: 14,
-    paddingVertical: 5,
+    backgroundColor: 'rgba(16, 26, 38, 0.75)',
+    paddingHorizontal: 13,
+    paddingVertical: 4.5,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+    elevation: 2,
   },
   dateChipText: {
-    color: Colors.textSecondary,
-    fontSize: 11.5,
+    color: '#8E9EB2',
+    fontSize: 12,
     fontWeight: '600',
   },
   messagesList: {
@@ -1204,7 +1260,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   msgRowHighlighted: {
-    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    backgroundColor: 'rgba(83, 169, 230, 0.2)',
     borderRadius: 14,
     padding: 2,
   },
@@ -1213,30 +1269,38 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   bubble: {
-    borderRadius: 14,
-    padding: 10,
+    borderRadius: 16,
+    paddingHorizontal: 11,
+    paddingTop: 7,
+    paddingBottom: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
     elevation: 2,
     maxWidth: '100%',
   },
   bubbleRight: {
-    backgroundColor: Colors.sentBubble,
-    borderBottomRightRadius: 3,
+    backgroundColor: '#2B5278',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 4,
     borderWidth: 1,
-    borderColor: Colors.sentBubbleBorder,
+    borderColor: 'rgba(83, 169, 230, 0.18)',
   },
   bubbleLeft: {
-    backgroundColor: Colors.receivedBubble,
-    borderBottomLeftRadius: 3,
+    backgroundColor: '#182533',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderBottomRightRadius: 16,
+    borderBottomLeftRadius: 4,
     borderWidth: 1,
-    borderColor: Colors.receivedBubbleBorder,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   bubbleHighlighted: {
     borderWidth: 1.5,
-    borderColor: Colors.primary,
+    borderColor: '#53A9E6',
   },
   pinnedBadge: {
     flexDirection: 'row',
@@ -1244,7 +1308,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   pinnedText: {
-    color: Colors.primary,
+    color: '#53A9E6',
     fontSize: 10,
     fontWeight: 'bold',
     marginLeft: 4,
@@ -1263,19 +1327,19 @@ const styles = StyleSheet.create({
   replyBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(139, 92, 246, 0.16)',
+    backgroundColor: 'rgba(43, 82, 120, 0.25)',
     paddingVertical: 6,
     paddingHorizontal: 9,
     borderRadius: 8,
     marginBottom: 6,
     borderLeftWidth: 3.5,
-    borderLeftColor: Colors.primary,
+    borderLeftColor: '#53A9E6',
   },
   replyBarAccent: {
     width: 0,
   },
   replySender: {
-    color: Colors.primary,
+    color: '#53A9E6',
     fontSize: 12.5,
     fontWeight: '700',
     marginBottom: 2,
@@ -1295,10 +1359,10 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: Colors.primaryViolet,
+    backgroundColor: '#2AABEE',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: Colors.primaryViolet,
+    shadowColor: '#2AABEE',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
@@ -1313,7 +1377,7 @@ const styles = StyleSheet.create({
   },
   waveLine: {
     width: 3,
-    backgroundColor: Colors.primary,
+    backgroundColor: '#53A9E6',
     borderRadius: 2,
   },
   voiceDuration: {
@@ -1401,10 +1465,10 @@ const styles = StyleSheet.create({
   },
   floatingInputDock: {
     flex: 1,
-    backgroundColor: Colors.surfaceCard,
+    backgroundColor: '#17212B',
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.25)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
@@ -1415,7 +1479,7 @@ const styles = StyleSheet.create({
   floatingReplyPreviewBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(139, 92, 246, 0.12)',
+    backgroundColor: 'rgba(43, 82, 120, 0.22)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.07)',
     paddingVertical: 7,
@@ -1424,7 +1488,7 @@ const styles = StyleSheet.create({
   floatingReplyAccentLine: {
     width: 3.5,
     height: 30,
-    backgroundColor: Colors.primary,
+    backgroundColor: '#53A9E6',
     borderRadius: 2,
   },
   floatingReplyContent: {
@@ -1432,7 +1496,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   floatingReplySender: {
-    color: Colors.primary,
+    color: '#53A9E6',
     fontSize: 12.5,
     fontWeight: '700',
   },
@@ -1469,13 +1533,13 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: Colors.primaryViolet,
+    backgroundColor: '#2AABEE',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
-    shadowColor: Colors.primaryViolet,
+    shadowColor: '#2AABEE',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.45,
     shadowRadius: 8,
     elevation: 6,
   },
@@ -1483,21 +1547,21 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: Colors.primaryViolet,
+    backgroundColor: '#2AABEE',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
-    shadowColor: Colors.primaryViolet,
+    shadowColor: '#2AABEE',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.45,
     shadowRadius: 8,
     elevation: 6,
   },
   inputEmojiTray: {
     height: 260,
-    backgroundColor: Colors.surface,
+    backgroundColor: '#17212B',
     borderTopWidth: 1,
-    borderTopColor: Colors.divider,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
   },
   emojiTrayHeader: {
     flexDirection: 'row',
